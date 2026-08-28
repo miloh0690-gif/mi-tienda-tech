@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- ==================== SEGURIDAD: PILAR B (CSP & HEADERS) ==================== -->
+  <!-- 
+    Content Security Policy (CSP):
+    1. default-src 'self': Solo permite recursos del propio dominio por defecto.
+    2. script-src: Autoriza únicamente scripts de CDNs oficiales (Tailwind, Lucide, AOS, GSAP).
+    3. style-src: Autoriza hojas de estilo locales y de CDNs confiables.
+    4. img-src: Autoriza imágenes locales y de Unsplash.
+    5. upgrade-insecure-requests: Fuerza a todas las conexiones a viajar sobre HTTPS seguro.
+  -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com https://cdnjs.cloudflare.com;
+    style-src 'self' 'unsafe-inline' https://unpkg.com https://fonts.googleapis.com;
+    img-src 'self' https://images.unsplash.com data:;
+    font-src 'self' https://fonts.gstatic.com;
+    upgrade-insecure-requests;
+  ">
+  
+  <title>TechStore - Equipos Electrónicos Protegidos</title>
+  
+  <!-- Carga de CSS y Librerías Externas Autorizadas por la CSP -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+  <style>
+    .gpu-accelerated {
+      will-change: transform, opacity;
+      transform: translateZ(0);
+    }
+
+    .product-card {
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+    }
+
+    .product-card:hover {
+      transform: translateY(-8px) scale(1.02);
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased overflow-x-hidden">
+
+  <!-- ==================== ENCABEZADO Y NAVEGACIÓN ==================== -->
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Logotipo de la Tienda e Indicador HTTPS -->
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 cursor-pointer" id="brandLogo">
+          <div class="bg-blue-600 text-white p-2 rounded-lg shadow-blue-500/30 shadow-lg">
+            <i data-lucide="cpu" class="w-6 h-6"></i>
+          </div>
+          <span class="text-xl font-bold tracking-tight text-gray-900">TechStore</span>
+        </div>
+        <!-- Distintivo de Seguridad Activa -->
+        <span class="hidden lg:flex items-center gap-1 bg-emerald-50 text-emerald-700 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-200">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> SSL / CSP Activo
+        </span>
+      </div>
+
+      <!-- Barra de Búsqueda Sanitizada -->
+      <div class="hidden md:flex items-center flex-1 max-w-md mx-8">
+        <div class="relative w-full">
+          <input type="text" id="searchInput" placeholder="Buscar laptops, smartphones... (Protegido contra XSS)" 
+                 class="w-full pl-10 pr-4 py-2 text-sm bg-gray-100 border border-transparent rounded-full focus:bg-white focus:border-blue-500 focus:outline-none transition-all duration-300">
+          <i data-lucide="search" class="w-4 h-4 absolute left-3 top-2.5 text-gray-400"></i>
+        </div>
+      </div>
+
+      <!-- Botón del Carrito de Compras -->
+      <button id="cartBtn" class="relative p-2 text-gray-700 hover:text-blue-600 transition">
+        <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+        <span id="cartCount" class="absolute -top-1 -right-1 bg-blue-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ==================== BANNER PRINCIPAL ==================== -->
+  <section class="bg-slate-900 text-white py-14 md:py-20 relative overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-8 relative z-10"
+         data-aos="fade-up" data-aos-duration="1000">
+      <div class="space-y-4 max-w-xl">
+        <span class="bg-blue-500/20 text-blue-400 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider inline-block">
+          Plataforma Encriptada & Segura
+        </span>
+        <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight leading-tight">
+          Equipos Electrónicos de Alta Gama
+        </h1>
+        <p class="text-gray-400 text-sm md:text-base">
+          Encuentra laptops, móviles y accesorios con garantía oficial y pagos protegidos.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== NAVEGACIÓN DE CATEGORÍAS ==================== -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8" data-aos="fade-right">
+      <h2 class="text-2xl font-bold text-gray-900">Catálogo de Productos</h2>
+      
+      <!-- Filtros por Categoría -->
+      <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-none" id="categoryContainer">
+        <button onclick="filterCategory('all')" class="cat-btn bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap" data-cat="all">Todos</button>
+        <button onclick="filterCategory('laptops')" class="cat-btn bg-gray-200 text-gray-700 hover:bg-gray-300 px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap" data-cat="laptops">Laptops</button>
+        <button onclick="filterCategory('smartphones')" class="cat-btn bg-gray-200 text-gray-700 hover:bg-gray-300 px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap" data-cat="smartphones">Smartphones</button>
+        <button onclick="filterCategory('accesorios')" class="cat-btn bg-gray-200 text-gray-700 hover:bg-gray-300 px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap" data-cat="accesorios">Accesorios</button>
+      </div>
+    </div>
+
+    <!-- Red de Productos -->
+    <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <!-- Carga dinámica -->
+    </div>
+  </main>
+
+  <!-- Carga de Scripts -->
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+  <script>
+    // Inicialización de AOS
+    AOS.init({
+      duration: 800,
+      once: true,
+      easing: 'ease-out-cubic'
+    });
+
+    // ==================== SEGURIDAD: PILAR A (FUNCIÓN DE SANITIZACIÓN) ====================
+    /**
+     * Convierte entradas potencialmente maliciosas en texto seguro (Entidades HTML).
+     * Previene ataques de inyección HTML/Scripting (XSS).
+     */
+    function sanitizeInput(str) {
+      const tempDiv = document.createElement('div');
+      tempDiv.textContent = str;
+      return tempDiv.innerHTML;
+    }
+
+    // Base de Datos de Productos
+    const products = [
+      { id: 1, name: "Laptop Pro 16\"", category: "laptops", price: 1499, image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500&q=80", desc: "Procesador de última generación con 16GB RAM." },
+      { id: 2, name: "Smartphone Ultra 5G", category: "smartphones", price: 999, image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500&q=80", desc: "Pantalla OLED 120Hz y cámara de 108MP." },
+      { id: 3, name: "Audífonos Noise Cancelling", category: "accesorios", price: 299, image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80", desc: "Cancelación de ruido activa y batería de 30 horas." },
+      { id: 4, name: "Laptop Slim 14\"", category: "laptops", price: 899, image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500&q=80", desc: "Ultraligera, ideal para productividad en movimiento." },
+      { id: 5, name: "Reloj Inteligente Fit", category: "accesorios", price: 199, image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80", desc: "Monitoreo cardíaco y resistencia al agua 50m." },
+      { id: 6, name: "Smartphone Mini", category: "smartphones", price: 699, image: "https://images.unsplash.com/photo-1565849904461-04a58ad377e0?w=500&q=80", desc: "Potencia compacta en una pantalla de 5.4 pulgadas." }
+    ];
+
+    let cart = [];
+
+    // Renderizado seguro utilizando asignación estricta de variables sanitizadas
+    function renderProducts(items) {
+      const container = document.getElementById('productGrid');
+      container.innerHTML = '';
+
+      if (items.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full text-center py-12">
+            <p class="text-gray-500 font-medium">No se encontraron productos coincidentes.</p>
+          </div>
+        `;
+        return;
+      }
+
+      items.forEach((product, index) => {
+        // Sanitizamos los datos antes de inyectarlos en la interfaz
+        const safeName = sanitizeInput(product.name);
+        const safeDesc = sanitizeInput(product.desc);
+        const safeCategory = sanitizeInput(product.category);
+
+        const card = document.createElement('div');
+        card.setAttribute('data-aos', 'zoom-in-up');
+        card.setAttribute('data-aos-delay', (index * 100).toString());
+        
+        card.className = "product-card gpu-accelerated bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg";
+        card.innerHTML = `
+          <div class="h-48 bg-gray-100 relative overflow-hidden group">
+            <img src="${product.image}" alt="${safeName}" loading="lazy" 
+                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+          </div>
+          <div class="p-4 flex flex-col justify-between h-52">
+            <div>
+              <span class="text-xs font-semibold text-blue-600 uppercase tracking-wider">${safeCategory}</span>
+              <h3 class="font-bold text-gray-900 mt-1">${safeName}</h3>
+              <p class="text-xs text-gray-500 mt-1 line-clamp-2">${safeDesc}</p>
+            </div>
+            <div class="flex items-center justify-between mt-4">
+              <span class="text-lg font-extrabold text-gray-900">$${product.price}</span>
+              <button onclick="addToCart(event, ${product.id})" 
+                      class="bg-gray-900 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition flex items-center gap-1 active:scale-95">
+                <i data-lucide="plus" class="w-4 h-4"></i> Agregar
+              </button>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      lucide.createIcons();
+      AOS.refresh();
+    }
+
+    function filterCategory(category) {
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        if (btn.getAttribute('data-cat') === category) {
+          btn.className = "cat-btn bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap";
+        } else {
+          btn.className = "cat-btn bg-gray-200 text-gray-700 hover:bg-gray-300 px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap";
+        }
+      });
+
+      if (category === 'all') {
+        renderProducts(products);
+      } else {
+        const filtered = products.filter(p => p.category === category);
+        renderProducts(filtered);
+      }
+    }
+
+    function addToCart(event, productId) {
+      cart.push(productId);
+      const countEl = document.getElementById('cartCount');
+      const cartBtn = document.getElementById('cartBtn');
+
+      countEl.innerText = cart.length;
+      countEl.classList.remove('hidden');
+
+      gsap.fromTo(event.currentTarget, 
+        { scale: 0.8 }, 
+        { scale: 1, duration: 0.4, ease: "back.out(2)" }
+      );
+
+      gsap.fromTo(cartBtn, 
+        { scale: 1.4, rotate: -10 }, 
+        { scale: 1, rotate: 0, duration: 0.5, ease: "elastic.out(1, 0.3)" }
+      );
+    }
+
+    // Buscador interactivo protegido con sanitización inmediata
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      // 1. Sanitizamos lo que escribe el usuario en tiempo real
+      const cleanQuery = sanitizeInput(e.target.value.toLowerCase().trim());
+      
+      // 2. Buscamos sobre los productos usando la entrada limpia
+      const filtered = products.filter(p => 
+        p.name.toLowerCase().includes(cleanQuery) || 
+        p.desc.toLowerCase().includes(cleanQuery)
+      );
+      
+      renderProducts(filtered);
+    });
+
+    // Renderizado inicial
+    renderProducts(products);
+  </script>
+</body>
+</html>

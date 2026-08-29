@@ -1,263 +1,377 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <!-- ==================== SEGURIDAD: PILAR B (CSP & HEADERS) ==================== -->
-  <!-- 
-    Content Security Policy (CSP):
-    1. default-src 'self': Solo permite recursos del propio dominio por defecto.
-    2. script-src: Autoriza únicamente scripts de CDNs oficiales (Tailwind, Lucide, AOS, GSAP).
-    3. style-src: Autoriza hojas de estilo locales y de CDNs confiables.
-    4. img-src: Autoriza imágenes locales y de Unsplash.
-    5. upgrade-insecure-requests: Fuerza a todas las conexiones a viajar sobre HTTPS seguro.
-  -->
-  <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self';
-    script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com https://cdnjs.cloudflare.com;
-    style-src 'self' 'unsafe-inline' https://unpkg.com https://fonts.googleapis.com;
-    img-src 'self' https://images.unsplash.com data:;
-    font-src 'self' https://fonts.gstatic.com;
-    upgrade-insecure-requests;
-  ">
-  
-  <title>TechStore - Equipos Electrónicos Protegidos</title>
-  
-  <!-- Carga de CSS y Librerías Externas Autorizadas por la CSP -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NODO — Equipos Electrónicos</title>
+<meta name="description" content="Catálogo de equipos electrónicos por categoría. Celulares, laptops, audio, gaming, cámaras y más.">
 
-  <style>
-    .gpu-accelerated {
-      will-change: transform, opacity;
-      transform: translateZ(0);
-    }
+<!--
+  CSP vía meta tag: cubre qué recursos puede cargar/ejecutar la página.
+  Lista blanca = solo los dominios que realmente usamos (Tailwind CDN, fuentes de Google,
+  AOS por jsdelivr, y el endpoint de Apps Script para el catálogo).
+  'unsafe-inline' en script-src es la concesión que exige el sitio sin build (Tailwind config
+  y la lógica de productos van inline). Al migrar a Vite/build (paso de despliegue) esto se
+  reemplaza por hashes o mover ese JS a archivos externos, y se puede quitar 'unsafe-inline'.
+-->
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net;
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net;
+  font-src 'self' https://fonts.gstatic.com;
+  img-src 'self' data: https:;
+  connect-src 'self' https://script.google.com https://script.googleusercontent.com;
+  frame-src 'none';
+  object-src 'none';
+  base-uri 'self';
+  form-action 'self';
+">
 
-    .product-card {
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
-    }
-
-    .product-card:hover {
-      transform: translateY(-8px) scale(1.02);
-    }
-  </style>
-</head>
-<body class="bg-gray-50 text-gray-800 font-sans antialiased overflow-x-hidden">
-
-  <!-- ==================== ENCABEZADO Y NAVEGACIÓN ==================== -->
-  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      
-      <!-- Logotipo de la Tienda e Indicador HTTPS -->
-      <div class="flex items-center gap-3">
-        <div class="flex items-center gap-2 cursor-pointer" id="brandLogo">
-          <div class="bg-blue-600 text-white p-2 rounded-lg shadow-blue-500/30 shadow-lg">
-            <i data-lucide="cpu" class="w-6 h-6"></i>
-          </div>
-          <span class="text-xl font-bold tracking-tight text-gray-900">TechStore</span>
-        </div>
-        <!-- Distintivo de Seguridad Activa -->
-        <span class="hidden lg:flex items-center gap-1 bg-emerald-50 text-emerald-700 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-200">
-          <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> SSL / CSP Activo
-        </span>
-      </div>
-
-      <!-- Barra de Búsqueda Sanitizada -->
-      <div class="hidden md:flex items-center flex-1 max-w-md mx-8">
-        <div class="relative w-full">
-          <input type="text" id="searchInput" placeholder="Buscar laptops, smartphones... (Protegido contra XSS)" 
-                 class="w-full pl-10 pr-4 py-2 text-sm bg-gray-100 border border-transparent rounded-full focus:bg-white focus:border-blue-500 focus:outline-none transition-all duration-300">
-          <i data-lucide="search" class="w-4 h-4 absolute left-3 top-2.5 text-gray-400"></i>
-        </div>
-      </div>
-
-      <!-- Botón del Carrito de Compras -->
-      <button id="cartBtn" class="relative p-2 text-gray-700 hover:text-blue-600 transition">
-        <i data-lucide="shopping-bag" class="w-6 h-6"></i>
-        <span id="cartCount" class="absolute -top-1 -right-1 bg-blue-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
-      </button>
-    </div>
-  </header>
-
-  <!-- ==================== BANNER PRINCIPAL ==================== -->
-  <section class="bg-slate-900 text-white py-14 md:py-20 relative overflow-hidden">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-8 relative z-10"
-         data-aos="fade-up" data-aos-duration="1000">
-      <div class="space-y-4 max-w-xl">
-        <span class="bg-blue-500/20 text-blue-400 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider inline-block">
-          Plataforma Encriptada & Segura
-        </span>
-        <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight leading-tight">
-          Equipos Electrónicos de Alta Gama
-        </h1>
-        <p class="text-gray-400 text-sm md:text-base">
-          Encuentra laptops, móviles y accesorios con garantía oficial y pagos protegidos.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ==================== NAVEGACIÓN DE CATEGORÍAS ==================== -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8" data-aos="fade-right">
-      <h2 class="text-2xl font-bold text-gray-900">Catálogo de Productos</h2>
-      
-      <!-- Filtros por Categoría -->
-      <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-none" id="categoryContainer">
-        <button onclick="filterCategory('all')" class="cat-btn bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap" data-cat="all">Todos</button>
-        <button onclick="filterCategory('laptops')" class="cat-btn bg-gray-200 text-gray-700 hover:bg-gray-300 px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap" data-cat="laptops">Laptops</button>
-        <button onclick="filterCategory('smartphones')" class="cat-btn bg-gray-200 text-gray-700 hover:bg-gray-300 px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap" data-cat="smartphones">Smartphones</button>
-        <button onclick="filterCategory('accesorios')" class="cat-btn bg-gray-200 text-gray-700 hover:bg-gray-300 px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap" data-cat="accesorios">Accesorios</button>
-      </div>
-    </div>
-
-    <!-- Red de Productos -->
-    <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      <!-- Carga dinámica -->
-    </div>
-  </main>
-
-  <!-- Carga de Scripts -->
-  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-
-  <script>
-    // Inicialización de AOS
-    AOS.init({
-      duration: 800,
-      once: true,
-      easing: 'ease-out-cubic'
-    });
-
-    // ==================== SEGURIDAD: PILAR A (FUNCIÓN DE SANITIZACIÓN) ====================
-    /**
-     * Convierte entradas potencialmente maliciosas en texto seguro (Entidades HTML).
-     * Previene ataques de inyección HTML/Scripting (XSS).
-     */
-    function sanitizeInput(str) {
-      const tempDiv = document.createElement('div');
-      tempDiv.textContent = str;
-      return tempDiv.innerHTML;
-    }
-
-    // Base de Datos de Productos
-    const products = [
-      { id: 1, name: "Laptop Pro 16\"", category: "laptops", price: 1499, image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500&q=80", desc: "Procesador de última generación con 16GB RAM." },
-      { id: 2, name: "Smartphone Ultra 5G", category: "smartphones", price: 999, image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500&q=80", desc: "Pantalla OLED 120Hz y cámara de 108MP." },
-      { id: 3, name: "Audífonos Noise Cancelling", category: "accesorios", price: 299, image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80", desc: "Cancelación de ruido activa y batería de 30 horas." },
-      { id: 4, name: "Laptop Slim 14\"", category: "laptops", price: 899, image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500&q=80", desc: "Ultraligera, ideal para productividad en movimiento." },
-      { id: 5, name: "Reloj Inteligente Fit", category: "accesorios", price: 199, image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80", desc: "Monitoreo cardíaco y resistencia al agua 50m." },
-      { id: 6, name: "Smartphone Mini", category: "smartphones", price: 699, image: "https://images.unsplash.com/photo-1565849904461-04a58ad377e0?w=500&q=80", desc: "Potencia compacta en una pantalla de 5.4 pulgadas." }
-    ];
-
-    let cart = [];
-
-    // Renderizado seguro utilizando asignación estricta de variables sanitizadas
-    function renderProducts(items) {
-      const container = document.getElementById('productGrid');
-      container.innerHTML = '';
-
-      if (items.length === 0) {
-        container.innerHTML = `
-          <div class="col-span-full text-center py-12">
-            <p class="text-gray-500 font-medium">No se encontraron productos coincidentes.</p>
-          </div>
-        `;
-        return;
-      }
-
-      items.forEach((product, index) => {
-        // Sanitizamos los datos antes de inyectarlos en la interfaz
-        const safeName = sanitizeInput(product.name);
-        const safeDesc = sanitizeInput(product.desc);
-        const safeCategory = sanitizeInput(product.category);
-
-        const card = document.createElement('div');
-        card.setAttribute('data-aos', 'zoom-in-up');
-        card.setAttribute('data-aos-delay', (index * 100).toString());
-        
-        card.className = "product-card gpu-accelerated bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg";
-        card.innerHTML = `
-          <div class="h-48 bg-gray-100 relative overflow-hidden group">
-            <img src="${product.image}" alt="${safeName}" loading="lazy" 
-                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-          </div>
-          <div class="p-4 flex flex-col justify-between h-52">
-            <div>
-              <span class="text-xs font-semibold text-blue-600 uppercase tracking-wider">${safeCategory}</span>
-              <h3 class="font-bold text-gray-900 mt-1">${safeName}</h3>
-              <p class="text-xs text-gray-500 mt-1 line-clamp-2">${safeDesc}</p>
-            </div>
-            <div class="flex items-center justify-between mt-4">
-              <span class="text-lg font-extrabold text-gray-900">$${product.price}</span>
-              <button onclick="addToCart(event, ${product.id})" 
-                      class="bg-gray-900 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition flex items-center gap-1 active:scale-95">
-                <i data-lucide="plus" class="w-4 h-4"></i> Agregar
-              </button>
-            </div>
-          </div>
-        `;
-        container.appendChild(card);
-      });
-
-      lucide.createIcons();
-      AOS.refresh();
-    }
-
-    function filterCategory(category) {
-      document.querySelectorAll('.cat-btn').forEach(btn => {
-        if (btn.getAttribute('data-cat') === category) {
-          btn.className = "cat-btn bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap";
-        } else {
-          btn.className = "cat-btn bg-gray-200 text-gray-700 hover:bg-gray-300 px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap";
+<!-- Tailwind (modo prototipo vía CDN — para producción se compila con PostCSS, ver Paso 2 en el plan) -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          base: '#0B0F14',
+          panel: '#121922',
+          panel2: '#1A2530',
+          line: '#233140',
+          cyan: '#5EEAD4',
+          amber: '#F5A623',
+          ink: '#E8EDF2',
+          muted: '#8195A6'
+        },
+        fontFamily: {
+          display: ['"Space Grotesk"', 'sans-serif'],
+          body: ['"Inter"', 'sans-serif'],
+          mono: ['"JetBrains Mono"', 'monospace']
         }
-      });
-
-      if (category === 'all') {
-        renderProducts(products);
-      } else {
-        const filtered = products.filter(p => p.category === category);
-        renderProducts(filtered);
       }
     }
+  }
+</script>
 
-    function addToCart(event, productId) {
-      cart.push(productId);
-      const countEl = document.getElementById('cartCount');
-      const cartBtn = document.getElementById('cartBtn');
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-      countEl.innerText = cart.length;
-      countEl.classList.remove('hidden');
+<!-- AOS: animaciones de scroll -->
+<link href="https://cdn.jsdelivr.net/npm/[email protected]/dist/aos.css" rel="stylesheet">
 
-      gsap.fromTo(event.currentTarget, 
-        { scale: 0.8 }, 
-        { scale: 1, duration: 0.4, ease: "back.out(2)" }
-      );
+<style>
+  html { scroll-behavior: smooth; }
+  body { background-color: #0B0F14; }
 
-      gsap.fromTo(cartBtn, 
-        { scale: 1.4, rotate: -10 }, 
-        { scale: 1, rotate: 0, duration: 0.5, ease: "elastic.out(1, 0.3)" }
-      );
-    }
+  /* Textura de fondo tipo grilla de PCB — sutil, no decorativa por decorar: marca el "territorio técnico" de la marca */
+  .pcb-grid {
+    background-image:
+      linear-gradient(#1A2530 1px, transparent 1px),
+      linear-gradient(90deg, #1A2530 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 100%);
+  }
 
-    // Buscador interactivo protegido con sanitización inmediata
-    document.getElementById('searchInput').addEventListener('input', (e) => {
-      // 1. Sanitizamos lo que escribe el usuario en tiempo real
-      const cleanQuery = sanitizeInput(e.target.value.toLowerCase().trim());
-      
-      // 2. Buscamos sobre los productos usando la entrada limpia
-      const filtered = products.filter(p => 
-        p.name.toLowerCase().includes(cleanQuery) || 
-        p.desc.toLowerCase().includes(cleanQuery)
-      );
-      
-      renderProducts(filtered);
+  /* Traza activa del selector de categoría — el elemento firma de esta página */
+  .trace-underline {
+    position: relative;
+  }
+  .trace-underline::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -9px;
+    height: 2px;
+    background: #5EEAD4;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.35s cubic-bezier(.65,0,.35,1);
+  }
+  .trace-underline[data-active="true"]::after { transform: scaleX(1); }
+
+  .spec-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.05em;
+  }
+
+  .card-lift {
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    will-change: transform;
+  }
+  .card-lift:hover {
+    transform: translateY(-6px);
+    border-color: #5EEAD4;
+    box-shadow: 0 12px 32px -12px rgba(94, 234, 212, 0.25);
+  }
+
+  .fade-hero > * { opacity: 0; transform: translateY(14px); animation: rise 0.7s cubic-bezier(.16,1,.3,1) forwards; }
+  .fade-hero > *:nth-child(1) { animation-delay: 0.05s; }
+  .fade-hero > *:nth-child(2) { animation-delay: 0.15s; }
+  .fade-hero > *:nth-child(3) { animation-delay: 0.25s; }
+  .fade-hero > *:nth-child(4) { animation-delay: 0.35s; }
+  @keyframes rise { to { opacity: 1; transform: translateY(0); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fade-hero > * { animation: none !important; opacity: 1 !important; transform: none !important; }
+    html { scroll-behavior: auto; }
+  }
+
+  ::selection { background: #5EEAD4; color: #0B0F14; }
+
+  /* Foco de teclado visible — piso de calidad, no opcional */
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid #5EEAD4;
+    outline-offset: 3px;
+  }
+</style>
+</head>
+
+<body class="bg-base text-ink font-body antialiased">
+
+<!-- ===================== HEADER ===================== -->
+<header class="sticky top-0 z-50 border-b border-line bg-base/90 backdrop-blur">
+  <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+    <a href="#inicio" class="flex items-center gap-2 font-display font-700 text-lg tracking-tight">
+      <span class="text-cyan">◈</span> NODO
+    </a>
+    <nav aria-label="Categorías principales" class="hidden md:flex items-center gap-7 spec-tag uppercase text-muted">
+      <a href="#catalogo" class="hover:text-ink transition-colors">Catálogo</a>
+      <a href="#nosotros" class="hover:text-ink transition-colors">Nosotros</a>
+      <a href="#contacto" class="hover:text-ink transition-colors">Contacto</a>
+    </nav>
+    <a href="#contacto"
+       class="spec-tag uppercase bg-cyan text-base px-4 py-2 rounded-sm font-medium hover:bg-white transition-colors">
+      Escribir por WhatsApp
+    </a>
+  </div>
+</header>
+
+<!-- ===================== HERO ===================== -->
+<section id="inicio" class="relative overflow-hidden pcb-grid">
+  <div class="max-w-7xl mx-auto px-6 pt-20 pb-24 fade-hero">
+    <p class="spec-tag uppercase text-cyan mb-4">// catálogo técnico 2026</p>
+    <h1 class="font-display font-700 text-5xl md:text-7xl leading-[1.05] max-w-3xl">
+      Equipos electrónicos, ordenados como deberían estarlo.
+    </h1>
+    <p class="text-muted text-lg max-w-xl mt-6 leading-relaxed">
+      Ocho categorías, cada producto con su ficha técnica al frente.
+      Sin vueltas: eliges, consultas stock y cierras la compra por WhatsApp.
+    </p>
+    <div class="mt-9 flex flex-wrap gap-4">
+      <a href="#catalogo" class="bg-ink text-base px-6 py-3 rounded-sm font-medium hover:bg-cyan transition-colors">
+        Ver catálogo
+      </a>
+      <a href="#contacto" class="border border-line px-6 py-3 rounded-sm font-medium hover:border-cyan transition-colors">
+        Hablar con un asesor
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SELECTOR DE CATEGORÍAS ===================== -->
+<nav id="catalogo" aria-label="Filtro de categorías" class="border-y border-line bg-panel sticky top-16 z-40">
+  <div class="max-w-7xl mx-auto px-6">
+    <div id="categoryTabs" class="flex gap-8 overflow-x-auto no-scrollbar py-4 spec-tag uppercase text-muted">
+      <!-- generado por JS -->
+    </div>
+  </div>
+</nav>
+
+<!-- ===================== GRID DE PRODUCTOS ===================== -->
+<main>
+  <section aria-label="Productos" class="max-w-7xl mx-auto px-6 py-14">
+    <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- generado por JS -->
+    </div>
+    <p id="emptyState" class="hidden text-center text-muted py-16 spec-tag uppercase">
+      No hay equipos cargados en esta categoría todavía.
+    </p>
+  </section>
+</main>
+
+<!-- ===================== NOSOTROS ===================== -->
+<section id="nosotros" class="border-t border-line bg-panel">
+  <div class="max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-3 gap-10">
+    <div data-aos="fade-up">
+      <p class="spec-tag text-cyan mb-2">01 / GARANTÍA</p>
+      <p class="text-muted leading-relaxed">Todo equipo sale con garantía escrita y factura. Si algo falla, se resuelve por el mismo canal donde compraste.</p>
+    </div>
+    <div data-aos="fade-up" data-aos-delay="100">
+      <p class="spec-tag text-cyan mb-2">02 / ENTREGA</p>
+      <p class="text-muted leading-relaxed">Coordinación directa por WhatsApp para entrega en La Paz o envío al interior. Sin formularios largos.</p>
+    </div>
+    <div data-aos="fade-up" data-aos-delay="200">
+      <p class="spec-tag text-cyan mb-2">03 / SOPORTE</p>
+      <p class="text-muted leading-relaxed">Antes y después de la compra: te ayudamos a elegir el equipo correcto para lo que realmente vas a hacer con él.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CONTACTO / FOOTER ===================== -->
+<footer id="contacto" class="border-t border-line">
+  <div class="max-w-7xl mx-auto px-6 py-16 grid md:grid-cols-2 gap-10 items-center">
+    <div data-aos="fade-up">
+      <h2 class="font-display font-700 text-3xl mb-3">¿Buscas un equipo específico?</h2>
+      <p class="text-muted max-w-md">Escríbenos qué necesitas y en qué rango de precio, y te mandamos opciones disponibles al momento.</p>
+    </div>
+    <div data-aos="fade-up" class="flex md:justify-end">
+      <a href="https://wa.me/59170000000?text=Hola%2C%20quiero%20consultar%20por%20un%20equipo"
+         target="_blank" rel="noopener"
+         class="bg-cyan text-base px-7 py-3.5 rounded-sm font-medium hover:bg-white transition-colors">
+        Escribir por WhatsApp
+      </a>
+    </div>
+  </div>
+  <div class="border-t border-line">
+    <div class="max-w-7xl mx-auto px-6 py-6 flex flex-col sm:flex-row justify-between gap-2 spec-tag uppercase text-muted">
+      <span>© 2026 NODO — La Paz, Bolivia</span>
+      <span>Equipos electrónicos por categoría</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ===================== ESTADO DE CARGA ===================== -->
+<div id="loadingState" class="max-w-7xl mx-auto px-6 py-16 text-center spec-tag uppercase text-muted hidden">
+  Cargando catálogo…
+</div>
+<div id="errorState" class="max-w-7xl mx-auto px-6 py-16 text-center spec-tag uppercase text-amber hidden">
+  No se pudo cargar el catálogo. Intenta recargar la página.
+</div>
+
+<!-- ===================== DATOS: se leen desde Google Sheets vía Apps Script ===================== -->
+<script>
+// URL del Web App publicado desde Apps Script (ver guía de despliegue aparte).
+// No es una clave secreta: solo expone lectura del catálogo, por eso puede vivir en el cliente.
+const SHEET_API_URL = 'PEGAR_AQUI_LA_URL_DE_TU_WEB_APP';
+
+const WHATSAPP_NUMBER = '59170000000'; // reemplazar por el número real del negocio
+
+let CATEGORIES = [];
+let PRODUCTS = [];
+let activeCategory = null;
+
+function slugify(text) {
+  return text
+    .toString()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // quita tildes
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+}
+
+// Convierte las filas crudas del Sheet en el formato que usa la UI,
+// y sanea todo texto antes de insertarlo en el DOM (ver renderProducts).
+function normalizeProducts(rows) {
+  return rows.map(r => ({
+    sku:  String(r.sku ?? r.SKU ?? '').trim(),
+    cat:  slugify(r.categoria ?? r.Categoria ?? ''),
+    catLabel: String(r.categoria ?? r.Categoria ?? '').trim(),
+    name: String(r.nombre ?? r.Nombre ?? '').trim(),
+    spec: String(r.especificacion ?? r.Especificacion ?? '').trim(),
+    price: String(r.precio ?? r.Precio ?? '').trim(),
+  })).filter(p => p.sku && p.name);
+}
+
+function buildCategories(products) {
+  const seen = new Map();
+  products.forEach(p => { if (!seen.has(p.cat)) seen.set(p.cat, p.catLabel); });
+  return Array.from(seen, ([id, label]) => ({ id, label }));
+}
+
+async function loadCatalog() {
+  const loading = document.getElementById('loadingState');
+  const error = document.getElementById('errorState');
+  loading.classList.remove('hidden');
+
+  try {
+    const res = await fetch(SHEET_API_URL);
+    if (!res.ok) throw new Error('Respuesta no válida del servidor');
+    const rows = await res.json();
+
+    PRODUCTS = normalizeProducts(rows);
+    CATEGORIES = buildCategories(PRODUCTS);
+    activeCategory = CATEGORIES[0]?.id ?? null;
+
+    renderTabs();
+    renderProducts();
+  } catch (err) {
+    console.error('Error cargando el catálogo:', err);
+    error.classList.remove('hidden');
+  } finally {
+    loading.classList.add('hidden');
+  }
+}
+
+// Sanea texto antes de insertarlo como HTML — nunca confiar en datos externos,
+// ni siquiera los de tu propio Sheet (alguien con acceso de edición podría meter HTML/JS).
+function escapeHTML(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function renderTabs() {
+  const tabs = document.getElementById('categoryTabs');
+  tabs.innerHTML = CATEGORIES.map(c => `
+    <button
+      class="trace-underline whitespace-nowrap pb-1 transition-colors ${c.id === activeCategory ? 'text-ink' : 'hover:text-ink'}"
+      data-active="${c.id === activeCategory}"
+      data-cat="${c.id}">
+      ${escapeHTML(c.label)}
+    </button>
+  `).join('');
+
+  tabs.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeCategory = btn.dataset.cat;
+      renderTabs();
+      renderProducts();
     });
+  });
+}
 
-    // Renderizado inicial
-    renderProducts(products);
-  </script>
+function renderProducts() {
+  const grid = document.getElementById('productGrid');
+  const empty = document.getElementById('emptyState');
+  const items = PRODUCTS.filter(p => p.cat === activeCategory);
+
+  empty.classList.toggle('hidden', items.length > 0);
+
+  grid.innerHTML = items.map((p, i) => `
+    <article
+      data-aos="fade-up" data-aos-delay="${(i % 3) * 80}"
+      class="card-lift group bg-panel border border-line rounded-md p-5 flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between mb-4">
+          <span class="spec-tag text-muted">[${escapeHTML(p.sku)}]</span>
+          <span class="spec-tag text-cyan">${escapeHTML(p.catLabel)}</span>
+        </div>
+        <h3 class="font-display font-600 text-xl mb-1">${escapeHTML(p.name)}</h3>
+        <p class="text-muted text-sm">${escapeHTML(p.spec)}</p>
+      </div>
+      <div class="mt-6 flex items-center justify-between">
+        <span class="font-mono text-lg text-ink">${escapeHTML(p.price)}</span>
+        <a href="https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Hola, quiero consultar por: ' + p.name + ' [' + p.sku + ']')}"
+           target="_blank" rel="noopener"
+           class="spec-tag uppercase border border-line px-3 py-2 rounded-sm hover:border-cyan hover:text-cyan transition-colors">
+          Consultar
+        </a>
+      </div>
+    </article>
+  `).join('');
+
+  if (window.AOS) AOS.refreshHard();
+}
+
+loadCatalog();
+</script>
+
+<!-- AOS init -->
+<script src="https://cdn.jsdelivr.net/npm/[email protected]/dist/aos.js"></script>
+<script>
+  AOS.init({ duration: 600, easing: 'ease-out-cubic', once: true, disable: 'reduce-motion' });
+</script>
+
 </body>
 </html>

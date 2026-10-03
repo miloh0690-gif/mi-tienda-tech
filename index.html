@@ -1,377 +1,1262 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-BO">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NODO — Equipos Electrónicos</title>
-<meta name="description" content="Catálogo de equipos electrónicos por categoría. Celulares, laptops, audio, gaming, cámaras y más.">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
 <!--
-  CSP vía meta tag: cubre qué recursos puede cargar/ejecutar la página.
-  Lista blanca = solo los dominios que realmente usamos (Tailwind CDN, fuentes de Google,
-  AOS por jsdelivr, y el endpoint de Apps Script para el catálogo).
-  'unsafe-inline' en script-src es la concesión que exige el sitio sin build (Tailwind config
-  y la lógica de productos van inline). Al migrar a Vite/build (paso de despliegue) esto se
-  reemplaza por hashes o mover ese JS a archivos externos, y se puede quitar 'unsafe-inline'.
+  CSP por meta tag. Sin build, así que no hay forma de usar hashes: va 'unsafe-inline'
+  en script-src porque la lógica del catálogo va inline en el módulo.
+
+  Lo que hay que mirar si algo no carga:
+  - unpkg en script-src: three.js y sus addons (OrbitControls, GLTFLoader, RoomEnvironment).
+  - unpkg en connect-src: el decificador de Draco se descarga aparte (.js + .wasm).
+  - 'wasm-unsafe-eval': el decificador de Draco compila WebAssembly. SIN ESTO Chrome
+    falla el visor en silencio. Es el error más difícil de ver de todo el 3D.
+  - img-src con data: para los placeholders; sin https: porque las fotos van a venir
+    de donde sea hasta que se suban a img/.
 -->
 <meta http-equiv="Content-Security-Policy" content="
   default-src 'self';
-  script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net;
-  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net;
-  font-src 'self' https://fonts.gstatic.com;
+  script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://unpkg.com;
+  style-src 'self' 'unsafe-inline';
   img-src 'self' data: https:;
-  connect-src 'self' https://script.google.com https://script.googleusercontent.com;
+  connect-src 'self' https://unpkg.com;
+  font-src 'self';
   frame-src 'none';
   object-src 'none';
   base-uri 'self';
   form-action 'self';
 ">
-
-<!-- Tailwind (modo prototipo vía CDN — para producción se compila con PostCSS, ver Paso 2 en el plan) -->
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        colors: {
-          base: '#0B0F14',
-          panel: '#121922',
-          panel2: '#1A2530',
-          line: '#233140',
-          cyan: '#5EEAD4',
-          amber: '#F5A623',
-          ink: '#E8EDF2',
-          muted: '#8195A6'
-        },
-        fontFamily: {
-          display: ['"Space Grotesk"', 'sans-serif'],
-          body: ['"Inter"', 'sans-serif'],
-          mono: ['"JetBrains Mono"', 'monospace']
-        }
-      }
-    }
-  }
-</script>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-
-<!-- AOS: animaciones de scroll -->
-<link href="https://cdn.jsdelivr.net/npm/[email protected]/dist/aos.css" rel="stylesheet">
-
+<title>Moon Tech Mobile — Celulares, laptops, línea blanca y accesorios</title>
+<meta name="description" content="Tienda de celulares, laptops, línea blanca y accesorios electrónicos. Los modelos más recientes se ven en 3D.">
+<meta property="og:title" content="Moon Tech Mobile">
+<meta property="og:description" content="Celulares, laptops, línea blanca y accesorios. Los modelos más recientes se ven en 3D.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://unpkg.com" crossorigin>
 <style>
-  html { scroll-behavior: smooth; }
-  body { background-color: #0B0F14; }
+:root{
+  --negro:#000;
+  --fondo:#0b0b0d;
+  --fondo-2:#131316;
+  --linea:rgba(255,255,255,.12);
+  --linea-fuerte:rgba(255,255,255,.24);
+  --txt:#f5f5f7;
+  --txt-2:#a1a1a6;
+  --txt-3:#6e6e73;
+  --azul:#2997ff;
+  --radio:18px;
+  --radio-s:12px;
+  --pad:max(22px,5vw);
+  --max:1120px;
+  --fuente:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--negro);color:var(--txt);font-family:var(--fuente);
+  font-size:17px;line-height:1.47;letter-spacing:-.011em;
+  overflow-x:hidden;-webkit-font-smoothing:antialiased;
+}
+body.abierto{overflow:hidden}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+h1,h2,h3,h4,p,ul,figure{margin:0}
+ul{padding:0;list-style:none}
+:focus-visible{outline:2px solid var(--azul);outline-offset:3px;border-radius:4px}
+.oculto{display:none!important}
 
-  /* Textura de fondo tipo grilla de PCB — sutil, no decorativa por decorar: marca el "territorio técnico" de la marca */
-  .pcb-grid {
-    background-image:
-      linear-gradient(#1A2530 1px, transparent 1px),
-      linear-gradient(90deg, #1A2530 1px, transparent 1px);
-    background-size: 48px 48px;
-    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 100%);
-  }
+.envoltorio{max-width:var(--max);margin:0 auto;padding-inline:var(--pad);width:100%}
+.seccion{padding-block:clamp(56px,9vw,110px)}
+.revela{opacity:0;transform:translateY(26px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
+.revela.visible{opacity:1;transform:none}
 
-  /* Traza activa del selector de categoría — el elemento firma de esta página */
-  .trace-underline {
-    position: relative;
-  }
-  .trace-underline::after {
-    content: '';
-    position: absolute;
-    left: 0; right: 0; bottom: -9px;
-    height: 2px;
-    background: #5EEAD4;
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.35s cubic-bezier(.65,0,.35,1);
-  }
-  .trace-underline[data-active="true"]::after { transform: scaleX(1); }
+/* ---------- encabezado ---------- */
+.cabecera{position:sticky;top:0;z-index:60;background:rgba(11,11,13,.72);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid transparent;transition:border-color .3s}
+.cabecera.desplaz{border-bottom-color:var(--linea)}
+.barra{display:flex;align-items:center;gap:16px;height:52px}
+.marca{font-size:17px;font-weight:600;letter-spacing:-.02em;white-space:nowrap;display:flex;align-items:center;gap:7px}
+.marca svg{width:15px;height:17px;fill:currentColor}
+.nav{display:flex;gap:22px;margin-inline:auto;font-size:13px;color:var(--txt-2)}
+.nav a{transition:color .2s}
+.nav a:hover,.nav a[aria-current]{color:var(--txt)}
+.btn-wa{margin-left:auto;font-size:13px;font-weight:500;padding:7px 15px;border-radius:980px;background:var(--txt);color:#000;white-space:nowrap;transition:opacity .2s,transform .2s}
+.btn-wa:hover{opacity:.85}
+.btn-wa:active{transform:scale(.97)}
+.menu-btn{display:none;margin-left:auto;width:34px;height:34px;border-radius:8px;align-items:center;justify-content:center}
+.menu-btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round}
+@media(max-width:860px){
+  .nav{display:none}
+  .menu-btn{display:flex}
+  .btn-wa{margin-left:0}
+  .barra{gap:12px}
+}
+.nav-abajo{display:none;border-top:1px solid var(--linea);padding:8px 0 16px}
+.nav-abajo a{display:block;padding:11px 0;font-size:17px;color:var(--txt-2);border-bottom:1px solid var(--linea)}
+.nav-abajo a[aria-current]{color:var(--txt)}
+.abierto-menu .nav-abajo{display:block}
+@media(max-width:860px){.abierto-menu .barra{height:48px}}
 
-  .spec-tag {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.65rem;
-    letter-spacing: 0.05em;
-  }
+/* ---------- portada ---------- */
+.portada{position:relative;padding-block:clamp(48px,8vw,96px) clamp(56px,9vw,104px);text-align:center;overflow:hidden}
+.portada::despues{content:"";position:absolute;inset:-30% -10% auto;height:120%;background:radial-gradient(60% 55% at 50% 30%,rgba(41,151,255,.20),transparent 68%);pointer-events:none;z-index:-1}
+.eyebrow{font-size:13px;font-weight:500;color:var(--azul);letter-spacing:.02em;margin-bottom:10px}
+.titulo-portada{font-size:clamp(40px,8vw,80px);line-height:1.03;font-weight:600;letter-spacing:-.035em}
+.subtitulo{font-size:clamp(17px,2.4vw,24px);color:var(--txt-2);margin-top:10px;letter-spacing:-.015em}
+.acciones{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:26px}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:11px 22px;border-radius:980px;font-size:15px;font-weight:500;transition:background .2s,color .2s,border-color .2s,transform .15s}
+.btn:active{transform:scale(.98)}
+.btn-azul{background:var(--azul);color:#fff}
+.btn-azul:hover{background:#47a6ff}
+.btn-linea{border:1px solid var(--linea-fuerte);color:var(--txt)}
+.btn-linea:hover{border-color:var(--txt-3);background:rgba(255,255,255,.05)}
+.btn-mini{padding:8px 15px;font-size:13px}
 
-  .card-lift {
-    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-    will-change: transform;
-  }
-  .card-lift:hover {
-    transform: translateY(-6px);
-    border-color: #5EEAD4;
-    box-shadow: 0 12px 32px -12px rgba(94, 234, 212, 0.25);
-  }
+/* ---------- tira de categorías ---------- */
+.tira{border-block:1px solid var(--linea);background:var(--fondo-2)}
+.tira-lista{display:flex;gap:8px;overflow-x:auto;padding-block:12px;scrollbar-width:none;-ms-overflow-style:none;scroll-snap-type:x proximity}
+.tira-lista::-webkit-scrollbar{display:none}
+.tira-item{scroll-snap-align:start;white-space:nowrap;font-size:13px;color:var(--txt-2);padding:7px 15px;border-radius:980px;border:1px solid var(--linea);transition:color .2s,border-color .2s,background .2s}
+.tira-item:hover{color:var(--txt);border-color:var(--linea-fuerte)}
+.tira-item.activo{color:#000;background:var(--txt);border-color:var(--txt)}
 
-  .fade-hero > * { opacity: 0; transform: translateY(14px); animation: rise 0.7s cubic-bezier(.16,1,.3,1) forwards; }
-  .fade-hero > *:nth-child(1) { animation-delay: 0.05s; }
-  .fade-hero > *:nth-child(2) { animation-delay: 0.15s; }
-  .fade-hero > *:nth-child(3) { animation-delay: 0.25s; }
-  .fade-hero > *:nth-child(4) { animation-delay: 0.35s; }
-  @keyframes rise { to { opacity: 1; transform: translateY(0); } }
+/* ---------- encabezado de sección ---------- */
+.cab-sec{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:26px}
+.titulo-sec{font-size:clamp(28px,5vw,46px);line-height:1.06;font-weight:600;letter-spacing:-.03em}
+.bajada-sec{color:var(--txt-2);font-size:17px;margin-top:8px;max-width:52ch}
+.enlace-sec{color:var(--azul);font-size:15px;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+.enlace-sec::after{content:"";width:5px;height:5px;border-right:1.5px solid currentColor;border-top:1.5px solid currentColor;transform:rotate(45deg);transition:transform .2s}
+.enlace-sec:hover::after{transform:rotate(45deg) translate(2px,-2px)}
 
-  @media (prefers-reduced-motion: reduce) {
-    .fade-hero > * { animation: none !important; opacity: 1 !important; transform: none !important; }
-    html { scroll-behavior: auto; }
-  }
+/* ---------- carrusel de productos ---------- */
+.carrusel{position:relative}
+.pista{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(230px,1fr);gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px;scrollbar-width:none;-ms-overflow-style:none}
+.pista::-webkit-scrollbar{display:none}
+.flechas{display:none;gap:8px}
+.flechas button{width:38px;height:38px;border-radius:980px;border:1px solid var(--linea-fuerte);display:grid;place-items:center;transition:background .2s,border-color .2s}
+.flechas button:hover:not(:disabled){background:rgba(255,255,255,.07)}
+.flechas button:disabled{opacity:.28;cursor:default}
+.flechas svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+@media(min-width:900px){.flechas{display:flex}}
 
-  ::selection { background: #5EEAD4; color: #0B0F14; }
+.tarjeta{scroll-snap-align:start;background:var(--fondo-2);border:1px solid var(--linea);border-radius:var(--radio);padding:20px;display:flex;flex-direction:column;gap:12px;transition:transform .35s cubic-bezier(.22,1,.36,1),border-color .35s}
+.tarjeta:hover{transform:translateY(-4px);border-color:var(--linea-fuerte)}
+.tarjeta-etiqueta{display:inline-flex;align-self:flex-start;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--azul);background:rgba(41,151,255,.13);padding:4px 9px;border-radius:980px}
+.tarjeta-figura{position:relative;aspect-ratio:4/3;border-radius:var(--radio-s);overflow:hidden;background:linear-gradient(160deg,#1c1c20,#101013);display:grid;place-items:center}
+.tarjeta-figura img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.marca-agua{width:44%;height:44%;opacity:.5;color:var(--txt-3)}
+.tarjeta-nombre{font-size:17px;font-weight:600;letter-spacing:-.02em}
+.tarjeta-resumen{font-size:14px;color:var(--txt-2);flex:1}
+.tarjeta-precio{font-size:19px;font-weight:600;letter-spacing:-.02em}
+.tarjeta-precio small{font-size:13px;font-weight:400;color:var(--txt-3);display:block;letter-spacing:0}
+.muestras{display:flex;gap:6px}
+.muestra{width:15px;height:15px;border-radius:980px;border:1px solid rgba(255,255,255,.28);padding:0}
+.tarjeta-acciones{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
+.especificaciones{margin:2px 0 0;padding:0;border-top:1px solid var(--linea)}
+.especificaciones div{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--linea);font-size:13px}
+.especificaciones dt{color:var(--txt-3)}
+.especificaciones dd{margin:0;text-align:right}
 
-  /* Foco de teclado visible — piso de calidad, no opcional */
-  a:focus-visible, button:focus-visible {
-    outline: 2px solid #5EEAD4;
-    outline-offset: 3px;
-  }
+/* ---------- tarjetas de argumento ---------- */
+.rejilla-args{display:grid;gap:16px;grid-template-columns:1fr}
+@media(min-width:700px){.rejilla-args{grid-template-columns:1fr 1fr}}
+@media(min-width:1000px){.rejilla-args{grid-template-columns:repeat(3,1fr)}}
+.arg{border:1px solid var(--linea);border-radius:var(--radio);padding:24px;background:var(--fondo-2);text-align:left;transition:background .25s,border-color .25s,transform .35s cubic-bezier(.22,1,.36,1)}
+.arg:hover{background:#18181c;border-color:var(--linea-fuerte);transform:translateY(-4px)}
+.arg-ico{width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.08);display:grid;place-items:center;margin-bottom:14px}
+.arg-ico svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.arg h3{font-size:19px;font-weight:600;letter-spacing:-.02em}
+.arg p{color:var(--txt-2);font-size:14px;margin-top:7px}
+.arg-ver{margin-top:14px;font-size:13px;color:var(--azul);display:inline-flex;align-items:center;gap:5px}
+.arg-ver::after{content:"";width:5px;height:5px;border-right:1.5px solid currentColor;border-top:1.5px solid currentColor;transform:rotate(45deg)}
+
+/* ---------- anuncios ---------- */
+.anuncio{position:relative;border-radius:var(--radio);overflow:hidden;min-height:230px;display:flex;align-items:flex-end;padding:26px;border:1px solid var(--linea);background:linear-gradient(140deg,#191920,#0d0d10)}
+.anuncio h3{font-size:clamp(22px,3.4vw,30px);font-weight:600;letter-spacing:-.025em}
+.anuncio p{color:var(--txt-2);font-size:14px;margin-top:6px;max-width:46ch}
+
+/* ---------- acordeón ---------- */
+.acordeon{border-top:1px solid var(--linea)}
+.acordeon details{border-bottom:1px solid var(--linea)}
+.acordeon summary{list-style:none;cursor:pointer;padding:19px 0;font-size:19px;font-weight:500;letter-spacing:-.02em;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.acordeon summary::-webkit-details-marker{display:none}
+.acordeon summary::after{content:"";width:11px;height:11px;border-right:1.6px solid var(--txt-3);border-bottom:1.6px solid var(--txt-3);transform:rotate(45deg) translate(-3px,-3px);transition:transform .25s;flex:none}
+.acordeon details[open] summary::after{transform:rotate(225deg) translate(-3px,-3px)}
+.acordeon-cuerpo{padding-bottom:20px;color:var(--txt-2);font-size:15px;max-width:70ch}
+.acordeon-cuerpo ul{margin-top:9px;padding-left:18px;list-style:disc}
+.acordeon-cuerpo li{margin:5px 0}
+
+/* ---------- modal ---------- */
+.modal[hidden]{display:none}
+.modal{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;padding:18px}
+.modal-fondo{position:absolute;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);animation:aparece .25s ease}
+.modal-caja{position:relative;background:var(--fondo-2);border:1px solid var(--linea);border-radius:22px;width:min(940px,100%);max-height:min(88vh,900px);overflow:auto;overscroll-behavior:contain;animation:entra .32s cubic-bezier(.22,1,.36,1)}
+@keyframes aparece{from{opacity:0}}
+@keyframes entra{from{opacity:0;transform:translateY(22px) scale(.985)}}
+.modal-cerrar{position:absolute;top:14px;right:14px;z-index:2;width:34px;height:34px;border-radius:980px;background:rgba(255,255,255,.1);backdrop-filter:blur(10px);display:grid;place-items:center;transition:background .2s}
+.modal-cerrar:hover{background:rgba(255,255,255,.2)}
+.modal-cerrar svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round}
+.modal-cab{padding:32px 32px 0}
+.modal-etiqueta{font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--azul)}
+.modal-titulo{font-size:clamp(24px,4vw,36px);font-weight:600;letter-spacing:-.03em;line-height:1.08;margin-top:8px}
+.modal-sub{color:var(--txt-2);margin-top:10px;font-size:16px}
+.modal-cuerpo{padding:24px 32px 34px;display:grid;gap:14px}
+.bloque{border:1px solid var(--linea);border-radius:var(--radio);padding:20px;background:var(--fondo)}
+.bloque h4{font-size:19px;font-weight:600;letter-spacing:-.02em}
+.bloque p{color:var(--txt-2);font-size:15px;margin-top:8px}
+.bloque .imagen{margin-top:14px;border-radius:var(--radio-s);overflow:hidden;background:#0e0e11;aspect-ratio:16/9}
+.bloque .imagen img{width:100%;height:100%;object-fit:cover}
+.modal-pie{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:0 32px 32px}
+.credito{width:100%;margin:6px 0 0;font-size:11px;line-height:1.5;color:var(--txt-3)}
+
+/* ---------- visor 3D ---------- */
+.visor-wrap{position:relative;height:min(66vh,560px);background:radial-gradient(120% 100% at 50% 0%,#1a1a20,#0a0a0d);border-radius:var(--radio);overflow:hidden;border:1px solid var(--linea)}
+.visor{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+.visor:active{cursor:grabbing}
+.visor-sombra{position:absolute;left:50%;bottom:8%;width:56%;height:26px;transform:translateX(-50%);background:radial-gradient(50% 50% at 50% 50%,rgba(0,0,0,.65),transparent 72%);pointer-events:none;filter:blur(6px)}
+.visor-estado{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;color:var(--txt-2);font-size:14px;gap:12px;pointer-events:none}
+.visor-estado[hidden]{display:none}
+.visor-barra{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 13px;background:linear-gradient(transparent,rgba(0,0,0,.72));font-size:12px;color:var(--txt-2)}
+.visor-barra .grupo{display:flex;gap:6px}
+.visor-mini{padding:6px 12px;border-radius:980px;border:1px solid var(--linea-fuerte);background:rgba(0,0,0,.42);font-size:12px;color:var(--txt);backdrop-filter:blur(8px);transition:background .2s,opacity .2s}
+.visor-mini:hover:not(:disabled){background:rgba(255,255,255,.14)}
+.visor-mini:disabled{opacity:.34;cursor:default}
+.progreso{width:min(220px,60%);height:2px;background:rgba(255,255,255,.16);border-radius:2px;overflow:hidden}
+.progreso i{display:block;height:100%;width:0;background:var(--txt);transition:width .18s}
+.girar{display:inline-block;width:11px;height:11px;border:1.4px solid currentColor;border-top-color:transparent;border-radius:980px}
+.girar.pausa{border-top-color:currentColor;border-right-color:transparent}
+
+/* ---------- pie ---------- */
+.pie{border-top:1px solid var(--linea);padding-block:34px 26px;font-size:12px;color:var(--txt-3)}
+.notas{margin-bottom:22px}
+.notas li{padding:6px 0;border-bottom:1px solid var(--linea)}
+.notas li:last-child{border-bottom:0}
+.notas a{color:var(--txt-2);text-decoration:underline;text-underline-offset:2px}
+.pie-rejilla{display:grid;gap:22px;grid-template-columns:1fr 1fr;padding-block:20px;border-top:1px solid var(--linea)}
+@media(min-width:760px){.pie-rejilla{grid-template-columns:repeat(4,1fr)}}
+.pie-rejilla h4{color:var(--txt);font-size:12px;font-weight:600;margin-bottom:9px}
+.pie-rejilla a{display:block;padding:3px 0}
+.pie-rejilla a:hover{color:var(--txt-2)}
+.pie-fondo{display:flex;gap:14px;flex-wrap:wrap;align-items:center;border-top:1px solid var(--linea);padding-top:16px}
+.pie-fondo p{margin:0}
+
+/* ---------- avisos ---------- */
+.aviso{border:1px solid var(--linea);border-left:2px solid var(--azul);border-radius:var(--radio-s);padding:14px 16px;background:rgba(41,151,255,.06);font-size:14px;color:var(--txt-2)}
+.aviso strong{color:var(--txt);font-weight:600}
+
+@media(prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms!important;transition-duration:.01ms!important}
+  .revela{opacity:1;transform:none}
+}
 </style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.186.1/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.186.1/examples/jsm/"
+  }
+}
+</script>
 </head>
+<body>
 
-<body class="bg-base text-ink font-body antialiased">
-
-<!-- ===================== HEADER ===================== -->
-<header class="sticky top-0 z-50 border-b border-line bg-base/90 backdrop-blur">
-  <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-    <a href="#inicio" class="flex items-center gap-2 font-display font-700 text-lg tracking-tight">
-      <span class="text-cyan">◈</span> NODO
-    </a>
-    <nav aria-label="Categorías principales" class="hidden md:flex items-center gap-7 spec-tag uppercase text-muted">
-      <a href="#catalogo" class="hover:text-ink transition-colors">Catálogo</a>
-      <a href="#nosotros" class="hover:text-ink transition-colors">Nosotros</a>
-      <a href="#contacto" class="hover:text-ink transition-colors">Contacto</a>
+<header class="cabecera" id="cabecera">
+  <div class="envoltorio">
+    <div class="barra">
+      <a class="marca" href="#">
+        <svg viewBox="0 0 14 44" aria-hidden="true"><path d="m13.0729 17.6825a3.61 3.61 0 0 0 -1.7248 3.0365 3.5132 3.5132 0 0 0 2.1379 3.2223 8.394 8.394 0 0 1 -1.0948 2.2618c-.6816.9812-1.3943 1.9623-2.4787 1.9623s-1.3633-.63-2.613-.63c-1.2187 0-1.6525.6507-2.644.6507s-1.6834-.9089-2.4787-2.0243a9.7842 9.7842 0 0 1 -1.6628-5.2776c0-3.0984 2.014-4.7405 3.9969-4.7405 1.0535 0 1.9314.6919 2.5924.6919.63 0 1.6112-.7333 2.8092-.7333a3.7579 3.7579 0 0 1 3.1604 1.5802zm-3.7284-2.8918a3.5615 3.5615 0 0 0 .8469-2.22 1.5353 1.5353 0 0 0 -.031-.32 3.5686 3.5686 0 0 0 -2.3445 1.2084 3.4629 3.4629 0 0 0 -.8779 2.1585 1.419 1.419 0 0 0 .031.2892 1.19 1.19 0 0 0 .2169.0207 3.0935 3.0935 0 0 0 2.1586-1.1368z"/></svg>
+        Moon Tech Mobile
+      </a>
+      <nav class="nav" aria-label="Secciones">
+        <a href="#celulares">Celulares</a>
+        <a href="#laptops">Laptops</a>
+        <a href="#linea-blanca">Línea blanca</a>
+        <a href="#accesorios">Accesorios</a>
+        <a href="#argumentos">Por qué nosotros</a>
+      </nav>
+      <button class="menu-btn" id="menuBtn" aria-label="Abrir menú" aria-expanded="false" aria-controls="navAbajo">
+        <svg viewBox="0 0 18 18" aria-hidden="true"><path d="M2 5h14M2 9h14M2 13h14"/></svg>
+      </button>
+      <a class="btn-wa" id="waCabecera" href="#" target="_blank" rel="noopener">Escribir</a>
+    </div>
+    <nav class="nav-abajo" id="navAbajo" aria-label="Secciones, móvil">
+      <a href="#celulares">Celulares</a>
+      <a href="#laptops">Laptops</a>
+      <a href="#linea-blanca">Línea blanca</a>
+      <a href="#accesorios">Accesorios</a>
+      <a href="#argumentos">Por qué nosotros</a>
+      <a href="#preguntas">Preguntas</a>
     </nav>
-    <a href="#contacto"
-       class="spec-tag uppercase bg-cyan text-base px-4 py-2 rounded-sm font-medium hover:bg-white transition-colors">
-      Escribir por WhatsApp
-    </a>
   </div>
 </header>
 
-<!-- ===================== HERO ===================== -->
-<section id="inicio" class="relative overflow-hidden pcb-grid">
-  <div class="max-w-7xl mx-auto px-6 pt-20 pb-24 fade-hero">
-    <p class="spec-tag uppercase text-cyan mb-4">// catálogo técnico 2026</p>
-    <h1 class="font-display font-700 text-5xl md:text-7xl leading-[1.05] max-w-3xl">
-      Equipos electrónicos, ordenados como deberían estarlo.
-    </h1>
-    <p class="text-muted text-lg max-w-xl mt-6 leading-relaxed">
-      Ocho categorías, cada producto con su ficha técnica al frente.
-      Sin vueltas: eliges, consultas stock y cierras la compra por WhatsApp.
-    </p>
-    <div class="mt-9 flex flex-wrap gap-4">
-      <a href="#catalogo" class="bg-ink text-base px-6 py-3 rounded-sm font-medium hover:bg-cyan transition-colors">
-        Ver catálogo
-      </a>
-      <a href="#contacto" class="border border-line px-6 py-3 rounded-sm font-medium hover:border-cyan transition-colors">
-        Hablar con un asesor
-      </a>
-    </div>
-  </div>
-</section>
-
-<!-- ===================== SELECTOR DE CATEGORÍAS ===================== -->
-<nav id="catalogo" aria-label="Filtro de categorías" class="border-y border-line bg-panel sticky top-16 z-40">
-  <div class="max-w-7xl mx-auto px-6">
-    <div id="categoryTabs" class="flex gap-8 overflow-x-auto no-scrollbar py-4 spec-tag uppercase text-muted">
-      <!-- generado por JS -->
-    </div>
-  </div>
-</nav>
-
-<!-- ===================== GRID DE PRODUCTOS ===================== -->
 <main>
-  <section aria-label="Productos" class="max-w-7xl mx-auto px-6 py-14">
-    <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <!-- generado por JS -->
+
+  <section class="portada">
+    <div class="envoltorio">
+      <p class="eyebrow">Nuevo</p>
+      <h1 class="titulo-portada" id="tituloPortada">Moon Tech Mobile</h1>
+      <p class="subtitulo" id="subtituloPortada">Tecnología que se ve, se gira y se entiende.</p>
+      <div class="acciones">
+        <button class="btn btn-azul" id="btnPortada3d" hidden>
+          Ver en 3D
+        </button>
+        <a class="btn btn-linea" href="#celulares">Ver el catálogo</a>
+      </div>
     </div>
-    <p id="emptyState" class="hidden text-center text-muted py-16 spec-tag uppercase">
-      No hay equipos cargados en esta categoría todavía.
-    </p>
   </section>
+
+  <nav class="tira" aria-label="Ir a categoría">
+    <div class="envoltorio">
+      <ul class="tira-lista" id="tiraCategorias"></ul>
+    </div>
+  </nav>
+
+  <div id="catalogo"></div>
+
+  <section class="seccion" id="argumentos">
+    <div class="envoltorio">
+      <div class="cab-sec revela">
+        <div>
+          <h2 class="titulo-sec">Lo que no se ve en la etiqueta.</h2>
+          <p class="bajada-sec">Cuatro cosas por las que alguien prefiere comprarnos y no en la esquina.</p>
+        </div>
+      </div>
+      <div class="rejilla-args" id="rejillaArgs"></div>
+    </div>
+  </section>
+
+  <section class="seccion" id="anuncios" style="padding-top:0">
+    <div class="envoltorio" style="display:grid;gap:16px">
+      <article class="anuncio revela">
+        <div>
+          <h3>Llevamos el equipo a tu casa.</h3>
+          <p>Comprá online o en el local. Entrega en La Paz el mismo día si confirmás antes de las 15:00, y al interior del país por transportadora.</p>
+        </div>
+      </article>
+      <article class="anuncio revela">
+        <div>
+          <h3>Financiamiento sin interés.</h3>
+          <p>Hasta 12 cuotas con las tarjetas de los bancos que trabajamos. Sujeto a evaluación crediticia.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="seccion" id="preguntas" style="padding-top:0">
+    <div class="envoltorio" style="max-width:820px">
+      <h2 class="titulo-sec" style="margin-bottom:22px">Preguntas frecuentes</h2>
+      <div class="acordeon">
+        <details open>
+          <summary>¿La garantía es del fabricante?</summary>
+          <div class="acordeon-cuerpo">Sí. Todos los equipos vienen con la garantía oficial del fabricante y la gestionamos nosotros. No usamos repuestos alternativos ni reparamos fuera de servicio autorizado.</div>
+        </details>
+        <details>
+          <summary>¿Por qué algunos modelos tienen 3D y otros no?</summary>
+          <div class="acordeon-cuerpo">El visor 3D solo está en los modelos donde tenemos el archivo verificado y las fotos reales del producto. Cuando aparece el botón <strong>Ver en 3D</strong>, el modelo que ves es el que tenés en la mano. Si no aparece, es que todavía no lo cargamos.</div>
+        </details>
+        <details>
+          <summary>¿Aceptan cambio de equipo?</summary>
+          <div class="acordeon-cuerpo">Evaluamos el equipo usado en el local, con prueba de funcionamiento. El valor se descuenta del nuevo y el resto se completa en efectivo o con tarjeta.</div>
+        </details>
+        <details>
+          <summary>¿Hacen factura?</summary>
+          <div class="acordeon-cuerpo">Sí, factura con NIT a nombre de la persona o la empresa que compra. Para compras a empresas, coordinamos con contabilidad antes de retirar el equipo.</div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="seccion" style="padding-top:0">
+    <div class="envoltorio">
+      <div class="aviso">
+        <strong>Antes de publicar:</strong> definí <code>WHATSAPP_NUMERO</code> en el script de abajo, poné las fotos reales en <code>img/</code>, los modelos 3D en <code>modelos/</code>, y completá precios y especificaciones. Sin precio, el sitio muestra "Consultar" en vez de inventar un número.
+      </div>
+    </div>
+  </section>
+
 </main>
 
-<!-- ===================== NOSOTROS ===================== -->
-<section id="nosotros" class="border-t border-line bg-panel">
-  <div class="max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-3 gap-10">
-    <div data-aos="fade-up">
-      <p class="spec-tag text-cyan mb-2">01 / GARANTÍA</p>
-      <p class="text-muted leading-relaxed">Todo equipo sale con garantía escrita y factura. Si algo falla, se resuelve por el mismo canal donde compraste.</p>
+<footer class="pie">
+  <div class="envoltorio">
+    <ul class="notas">
+      <li>Los precios pueden cambiar sin previo aviso y no incluyen impuestos salvo que se indique. Confirmá el precio final antes de pagar.</li>
+      <li>El financiamiento está sujeto a evaluación de la entidad financiera y no es una oferta garantizada.</li>
+      <li>Las imágenes y la marca son ilustrativas del producto de referencia. El equipo que recibís es el del modelo y color que elegiste.</li>
+      <li>Las fechas de importación y los plazos de garantía los fija el fabricante y varían según el modelo.</li>
+    </ul>
+    <div class="pie-rejilla">
+      <div>
+        <h4>Comprar</h4>
+        <a href="#celulares">Celulares</a>
+        <a href="#laptops">Laptops</a>
+        <a href="#linea-blanca">Línea blanca</a>
+        <a href="#accesorios">Accesorios</a>
+      </div>
+      <div>
+        <h4>Ayuda</h4>
+        <a href="#preguntas">Preguntas frecuentes</a>
+        <a href="#" data-wa-general>Escribir por WhatsApp</a>
+        <a href="#argumentos">Por qué nosotros</a>
+      </div>
+      <div>
+        <h4>Tienda</h4>
+        <a href="#">Direcciones y horarios</a>
+        <a href="#">Garantías y reparaciones</a>
+        <a href="#">Trabajo con nosotros</a>
+      </div>
     </div>
-    <div data-aos="fade-up" data-aos-delay="100">
-      <p class="spec-tag text-cyan mb-2">02 / ENTREGA</p>
-      <p class="text-muted leading-relaxed">Coordinación directa por WhatsApp para entrega en La Paz o envío al interior. Sin formularios largos.</p>
-    </div>
-    <div data-aos="fade-up" data-aos-delay="200">
-      <p class="spec-tag text-cyan mb-2">03 / SOPORTE</p>
-      <p class="text-muted leading-relaxed">Antes y después de la compra: te ayudamos a elegir el equipo correcto para lo que realmente vas a hacer con él.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ===================== CONTACTO / FOOTER ===================== -->
-<footer id="contacto" class="border-t border-line">
-  <div class="max-w-7xl mx-auto px-6 py-16 grid md:grid-cols-2 gap-10 items-center">
-    <div data-aos="fade-up">
-      <h2 class="font-display font-700 text-3xl mb-3">¿Buscas un equipo específico?</h2>
-      <p class="text-muted max-w-md">Escríbenos qué necesitas y en qué rango de precio, y te mandamos opciones disponibles al momento.</p>
-    </div>
-    <div data-aos="fade-up" class="flex md:justify-end">
-      <a href="https://wa.me/59170000000?text=Hola%2C%20quiero%20consultar%20por%20un%20equipo"
-         target="_blank" rel="noopener"
-         class="bg-cyan text-base px-7 py-3.5 rounded-sm font-medium hover:bg-white transition-colors">
-        Escribir por WhatsApp
-      </a>
-    </div>
-  </div>
-  <div class="border-t border-line">
-    <div class="max-w-7xl mx-auto px-6 py-6 flex flex-col sm:flex-row justify-between gap-2 spec-tag uppercase text-muted">
-      <span>© 2026 NODO — La Paz, Bolivia</span>
-      <span>Equipos electrónicos por categoría</span>
+    <div class="pie-fondo">
+      <p>© <span id="anio"></span> Moon Tech Mobile. Todos los derechos reservados.</p>
     </div>
   </div>
 </footer>
 
-<!-- ===================== ESTADO DE CARGA ===================== -->
-<div id="loadingState" class="max-w-7xl mx-auto px-6 py-16 text-center spec-tag uppercase text-muted hidden">
-  Cargando catálogo…
-</div>
-<div id="errorState" class="max-w-7xl mx-auto px-6 py-16 text-center spec-tag uppercase text-amber hidden">
-  No se pudo cargar el catálogo. Intenta recargar la página.
-</div>
-
-<!-- ===================== DATOS: se leen desde Google Sheets vía Apps Script ===================== -->
-<script>
-// URL del Web App publicado desde Apps Script (ver guía de despliegue aparte).
-// No es una clave secreta: solo expone lectura del catálogo, por eso puede vivir en el cliente.
-const SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbzq3bT8MIxqwW4xxU1tYRpxspkvj-1cn9-5MsLqXLbKIgDGQTRifV91bNeIMIuTvPZj/exec';
-
-const WHATSAPP_NUMBER = '59170000000'; // reemplazar por el número real del negocio
-
-let CATEGORIES = [];
-let PRODUCTS = [];
-let activeCategory = null;
-
-function slugify(text) {
-  return text
-    .toString()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // quita tildes
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '');
-}
-
-// Convierte las filas crudas del Sheet en el formato que usa la UI,
-// y sanea todo texto antes de insertarlo en el DOM (ver renderProducts).
-function normalizeProducts(rows) {
-  return rows.map(r => ({
-    sku:  String(r.sku ?? r.SKU ?? '').trim(),
-    cat:  slugify(r.categoria ?? r.Categoria ?? ''),
-    catLabel: String(r.categoria ?? r.Categoria ?? '').trim(),
-    name: String(r.nombre ?? r.Nombre ?? '').trim(),
-    spec: String(r.especificacion ?? r.Especificacion ?? '').trim(),
-    price: String(r.precio ?? r.Precio ?? '').trim(),
-  })).filter(p => p.sku && p.name);
-}
-
-function buildCategories(products) {
-  const seen = new Map();
-  products.forEach(p => { if (!seen.has(p.cat)) seen.set(p.cat, p.catLabel); });
-  return Array.from(seen, ([id, label]) => ({ id, label }));
-}
-
-async function loadCatalog() {
-  const loading = document.getElementById('loadingState');
-  const error = document.getElementById('errorState');
-  loading.classList.remove('hidden');
-
-  try {
-    const res = await fetch(SHEET_API_URL);
-    if (!res.ok) throw new Error('Respuesta no válida del servidor');
-    const rows = await res.json();
-
-    PRODUCTS = normalizeProducts(rows);
-    CATEGORIES = buildCategories(PRODUCTS);
-    activeCategory = CATEGORIES[0]?.id ?? null;
-
-    renderTabs();
-    renderProducts();
-  } catch (err) {
-    console.error('Error cargando el catálogo:', err);
-    error.classList.remove('hidden');
-  } finally {
-    loading.classList.add('hidden');
-  }
-}
-
-// Sanea texto antes de insertarlo como HTML — nunca confiar en datos externos,
-// ni siquiera los de tu propio Sheet (alguien con acceso de edición podría meter HTML/JS).
-function escapeHTML(str) {
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
-}
-
-function renderTabs() {
-  const tabs = document.getElementById('categoryTabs');
-  tabs.innerHTML = CATEGORIES.map(c => `
-    <button
-      class="trace-underline whitespace-nowrap pb-1 transition-colors ${c.id === activeCategory ? 'text-ink' : 'hover:text-ink'}"
-      data-active="${c.id === activeCategory}"
-      data-cat="${c.id}">
-      ${escapeHTML(c.label)}
+<div class="modal" id="modal" hidden>
+  <div class="modal-fondo" data-cerrar></div>
+  <div class="modal-caja" role="dialog" aria-modal="true" aria-labelledby="modalTitulo">
+    <button class="modal-cerrar" data-cerrar aria-label="Cerrar">
+      <svg viewBox="0 0 36 36" aria-hidden="true"><path d="m20.1211 18 3.4395-3.4395c.5859-.5854.5859-1.5356 0-2.1211-.5859-.5859-1.5352-.5859-2.1211 0l-3.4395 3.4395-3.4395-3.4395c-.5859-.5859-1.5352-.5859-2.1211 0-.5859.5854-.5859 1.5356 0 2.1211l3.4395 3.4395-3.4395 3.4395c-.5859.5854-.5859 1.5356 0 2.1211.293.293.6768.4395 1.0605.4395s.7676-.1465 1.0605-.4395l3.4395-3.4395 3.4395 3.4395c.293.293.6768.4395 1.0605.4395s.7676-.1465 1.0605-.4395c.5859-.5854.5859-1.5356 0-2.1211l-3.4395-3.4395z"/></svg>
     </button>
-  `).join('');
+    <div class="modal-cab">
+      <p class="modal-etiqueta" id="modalEtiqueta"></p>
+      <h2 class="modal-titulo" id="modalTitulo"></h2>
+      <p class="modal-sub" id="modalSub"></p>
+    </div>
+    <div class="modal-cuerpo" id="modalCuerpo"></div>
+    <div class="modal-pie" id="modalPie"></div>
+  </div>
+</div>
 
-  tabs.querySelectorAll('button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      activeCategory = btn.dataset.cat;
-      renderTabs();
-      renderProducts();
+<script type="module">
+
+const WHATSAPP_NUMERO = "591000000000";
+
+const CATEGORIAS = [
+  { id: "celulares",     titulo: "Celulares",     bajada: "Los más recientes, con visor 3D para girar el equipo antes de comprarlo." },
+  { id: "laptops",       titulo: "Laptops",       bajada: "Para estudiar, trabajar y jugar." },
+  { id: "linea-blanca",  titulo: "Línea blanca",  bajada: "Refrigeradores, cocinas, lavarropas y más." },
+  { id: "accesorios",    titulo: "Accesorios",    bajada: "Cargadores, fundas, audio y lo que completa el equipo." }
+];
+
+const PRODUCTOS = [
+  {
+    id: "iphone-18-pro-max",
+    nombre: "iPhone 18 Pro Max",
+    cat: "celulares",
+    nuevo: true,
+    precioBs: null,
+    resumen: "Pantalla grande, cámara de tres lentes y batería de larga duración.",
+    img: "img/iphone-18-pro-max.jpg",
+    alt: "iPhone 18 Pro Max visto desde atrás",
+    modelo3d: "modelos/iphone_18_pro_max__high_quality_3d_model.glb",
+    modeloOcultar: ["Object_22"],
+    modeloCredito: "Modelo 3D de Pro Animator (Riju.mandal), CC BY 4.0, vía Sketchfab.",
+    muestras: [
+      { nombre: "Naranja cobrizo", hex: "#c8622c" },
+      { nombre: "Azul profundo", hex: "#1d3557" },
+      { nombre: "Plata", hex: "#d9dbe0" }
+    ],
+    specs: [
+      { k: "Pantalla", v: "6.9\"" },
+      { k: "Cámaras", v: "Triple trasera" },
+      { k: "Chip", v: "A19 Pro" }
+    ]
+  },
+  {
+    id: "galaxy-s26-ultra",
+    nombre: "Samsung Galaxy S26 Ultra",
+    cat: "celulares",
+    nuevo: true,
+    precioBs: null,
+    resumen: "El más grande de la línea, con pantalla muy alta y stylus incluido.",
+    img: "img/galaxy-s26-ultra.jpg",
+    alt: "Samsung Galaxy S26 Ultra visto desde atrás",
+    modelo3d: "modelos/samsung_galaxy_s26_ultra.glb",
+    modeloOcultar: ["Object_25", "Object_77"],
+    muestras: [
+      { nombre: "Titanio negro", hex: "#2b2b2e" },
+      { nombre: "Titanio gris", hex: "#8e8e93" },
+      { nombre: "Azul tono", hex: "#4a6fa5" }
+    ],
+    specs: [
+      { k: "Pantalla", v: "6.9\"" },
+      { k: "Cámaras", v: "Cuádruple trasera" },
+      { k: "Batería", v: "5.500 mAh" }
+    ]
+  },
+  {
+    id: "iphone-17",
+    nombre: "iPhone 17",
+    cat: "celulares",
+    nuevo: false,
+    precioBs: null,
+    resumen: "El modelo base de la generación. Cámara doble y tamaño manejable.",
+    img: "img/iphone-17.jpg",
+    alt: "iPhone 17 en color lavanda",
+    modelo3d: null,
+    muestras: [
+      { nombre: "Lavanda", hex: "#b7a5d8" },
+      { nombre: "Salvia", hex: "#a8b5a0" },
+      { nombre: "Negro", hex: "#1c1c1e" }
+    ],
+    specs: [
+      { k: "Pantalla", v: "6.3\"" },
+      { k: "Cámaras", v: "Doble trasera" }
+    ]
+  },
+  {
+    id: "redmi-note-15",
+    nombre: "Xiaomi Redmi Note 15",
+    cat: "celulares",
+    nuevo: false,
+    precioBs: null,
+    resumen: "Mucha pantalla y batería por muy poco. El más vendido de la tienda.",
+    img: "img/redmi-note-15.jpg",
+    alt: "Xiaomi Redmi Note 15",
+    modelo3d: null,
+    muestras: [
+      { nombre: "Azul", hex: "#2b5fa8" },
+      { nombre: "Negro", hex: "#1c1c1e" }
+    ],
+    specs: [
+      { k: "Pantalla", v: "6.7\"" },
+      { k: "Batería", v: "5.000 mAh" }
+    ]
+  },
+
+  {
+    id: "macbook-pro-14-m5",
+    nombre: "MacBook Pro 14\" M5",
+    cat: "laptops",
+    nuevo: true,
+    precioBs: null,
+    resumen: "Pantalla Liquid Retina XDR y chip M5 en un chassis de aluminio.",
+    img: "img/macbook-pro-14-m5.jpg",
+    alt: "MacBook Pro de 14 pulgadas, vista lateral",
+    modelo3d: "modelos/macbook_pro_14-inch_m5.glb",
+    muestras: [
+      { nombre: "Medianoche", hex: "#1d2530" },
+      { nombre: "Estelar", hex: "#e4e0d8" },
+      { nombre: "Plata", hex: "#e3e4e8" }
+    ],
+    specs: [
+      { k: "Pantalla", v: "13.6\"" },
+      { k: "Chip", v: "M4" },
+      { k: "Peso", v: "1.24 kg" }
+    ]
+  },
+  {
+    id: "notebook-gaming",
+    nombre: "Notebook Gaming 15\"",
+    cat: "laptops",
+    nuevo: false,
+    precioBs: null,
+    resumen: "Placa devideo dedicada y refrigeración para sesiones largas.",
+    img: "img/notebook-gaming.jpg",
+    alt: "Notebook gaming de 15 pulgadas",
+    modelo3d: null,
+    muestras: [
+      { nombre: "Negro", hex: "#1c1c1e" }
+    ],
+    specs: [
+      { k: "Pantalla", v: "15.6\"" },
+      { k: "Memoria", v: "16 GB" }
+    ]
+  },
+
+  {
+    id: "nevera-no-frost",
+    nombre: "Refrigerador No Frost 320 L",
+    cat: "linea-blanca",
+    nuevo: true,
+    precioBs: null,
+    resumen: "Dos puertas, sistema no frost y bajo consumo.",
+    img: "img/nevera-no-frost.jpg",
+    alt: "Refrigerador no frost de dos puertas",
+    muestras: [
+      { nombre: "Acero", hex: "#b9bcc0" },
+      { nombre: "Blanco", hex: "#ececed" }
+    ],
+    specs: [
+      { k: "Capacidad", v: "320 L" },
+      { k: "Control", v: "Digital" }
+    ]
+  },
+  {
+    id: "lavarropas-carga-frontal",
+    nombre: "Lavarropas Carga Frontal 18 kg",
+    cat: "linea-blanca",
+    nuevo: false,
+    precioBs: null,
+    resumen: "Carga frontal, centrifugado alto y 12 programas.",
+    img: "img/lavarropas.jpg",
+    alt: "Lavarropas de carga frontal",
+    modelo3d: null,
+    muestras: [
+      { nombre: "Blanco", hex: "#ececed" }
+    ],
+    specs: [
+      { k: "Carga", v: "18 kg" },
+      { k: "Programas", v: "12" }
+    ]
+  },
+
+  {
+    id: "audifonos-pro",
+    nombre: "Audífonos In-ear",
+    cat: "accesorios",
+    nuevo: true,
+    precioBs: null,
+    resumen: "Cancelación de ruido y estuche con carga.",
+    img: "img/audifonos.jpg",
+    alt: "Audífonos in-ear con estuche",
+    muestras: [
+      { nombre: "Blanco", hex: "#ececed" }
+    ],
+    specs: [
+      { k: "Cancelación", v: "Activa" },
+      { k: "Batería", v: "Estuche + audífonos" }
+    ]
+  },
+  {
+    id: "cargador-65w",
+    nombre: "Cargador 65 W USB-C",
+    cat: "accesorios",
+    nuevo: false,
+    precioBs: null,
+    resumen: "Carga el celular, la tablet y la laptop con un solo cable.",
+    img: "img/cargador-65w.jpg",
+    alt: "Cargador de 65 W con cable USB-C",
+    modelo3d: null,
+    muestras: [
+      { nombre: "Blanco", hex: "#ececed" }
+    ],
+    specs: [
+      { k: "Potencia", v: "65 W" },
+      { k: "Conector", v: "USB-C" }
+    ]
+  }
+];
+
+const ARGUMENTOS = [
+  {
+    id: "precio",
+    titulo: "Precio escrito, sin letra chica",
+    texto: "El precio que ves en la etiqueta es el que pagás. Sin cargos de finalización, sin sorpresas en la caja.",
+    bloques: [
+      { t: "Lo que incluye", p: "Equipo, cargador según el modelo, cable y la garantía oficial. Los accesorios de la caja que no vengan de fábrica los comprás aparte, y te lo decimos antes de cobrarte." },
+      { t: "Si el precio cambia", p: "Puede cambiar por tipo de cambio o por cambio de lista del proveedor. Si cambia después de que reservaste, se mantiene el que te confirmamos por escrito." }
+    ],
+    icono: '<path d="M4 7h16M4 12h16M4 17h10"/>'
+  },
+  {
+    id: "entrega",
+    titulo: "Entrega el mismo día en La Paz",
+    texto: "Confirmás por WhatsApp antes de las 15:00 y el equipo llega ese mismo día.",
+    bloques: [
+      { t: "En el local", p: "Retiro en el momento. Stock real, no es un catálogo de fábrica: lo que ves disponible es lo que hay en el estante." },
+      { t: "Al interior", p: "Enviamos por transportadora con seguro. Te mandamos el código de seguimiento y el número de Factura para la garantía." }
+    ],
+    icono: '<path d="M3 7h11v9H3zM14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17.5" cy="18" r="1.6"/>'
+  },
+  {
+    id: "garantia",
+    titulo: "Garantía oficial gestionada por nosotros",
+    texto: "No reparamos con repuestos alternativos. Si falla, lo llevamos a servicio autorizado y te avisamos.",
+    bloques: [
+      { t: "Cómo funciona", p: "Traés el equipo con su factura o con la caja y el número de serie. Lo llevamos al servicio autorizado del fabricante y te damos el número de caso." },
+      { t: "Tiempo", p: "El plazo lo pone el fabricante, no nosotros. Lo que sí garantizamos es gestionarlo y darte una respuesta concreta, no un \"estamos viendo\"." }
+    ],
+    icono: '<path d="M12 3l7 3v6c0 4.5-3 7.8-7 9-4-1.2-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/>'
+  },
+  {
+    id: "cambio",
+    titulo: "Aceptamos tu equipo usado",
+    texto: "Lo evaluamos en el local, con prueba de funcionamiento, y lo descontamos del nuevo.",
+    bloques: [
+      { t: "Tasación", p: "Tasamos según estado físico y funcionamiento, con los precios de wholesale del día. No compramos equipos con pantalla rota o motherboard dañada." },
+      { t: "Datos", p: "Antes de dejarlo, verificá que ya sacaste tus cuentas y que la configuración de fábrica quedó activa. Nosotros no nos responsabilizamos por datos que no nos entreguen." }
+    ],
+    icono: '<path d="M4 8h13l-3-3M20 16H7l3 3"/>'
+  }
+];
+
+const MONEDA = new Intl.NumberFormat("es-BO", { maximumFractionDigits: 0 });
+
+const $ = (sel, raiz = document) => raiz.querySelector(sel);
+const $$ = (sel, raiz = document) => Array.from(raiz.querySelectorAll(sel));
+
+function precioTexto(p) {
+  if (p.precioBs === null || p.precioBs === undefined) return { grande: "Consultar", nota: "precio a confirmar" };
+  return { grande: "Bs " + MONEDA.format(p.precioBs), nota: "o hasta 12 cuotas" };
+}
+
+function enlaceWA(producto) {
+  const base = "https://wa.me/" + WHATSAPP_NUMERO;
+  if (!producto) return base + "?text=" + encodeURIComponent("Hola, consulto por un equipo en Moon Tech Mobile.");
+  const partes = ["Hola, consulto por este equipo:", "• " + producto.nombre];
+  if (producto.precioBs != null) partes.push("• Precio publicado: Bs " + MONEDA.format(producto.precioBs));
+  if (producto.muestras && producto.muestras.length) partes.push("• Color: " + producto.muestras.map(m => m.nombre).join(" / "));
+  return base + "?text=" + encodeURIComponent(partes.join("\n"));
+}
+
+function iconoGlifo(cat) {
+  const d = {
+    celulares: '<rect x="7" y="2.5" width="10" height="19" rx="2.4"/><path d="M10.6 5.4h2.8"/>',
+    laptops: '<rect x="4" y="5" width="16" height="10.5" rx="1.4"/><path d="M2 18.4h20"/>',
+    "linea-blanca": '<rect x="5" y="2.5" width="14" height="19" rx="1.6"/><path d="M5 9.6h14M8.4 6h1.6M8.4 12.8h1.6"/>',
+    accesorios: '<path d="M6 8.6h12v6.2a5 5 0 0 1-5 5h-2a5 5 0 0 1-5-5z"/><path d="M6 11.4H4.2a2.4 2.4 0 0 1 0-4.8H6M18 11.4h1.8a2.4 2.4 0 0 0 0-4.8H18"/>'
+  }[cat];
+  return '<svg viewBox="0 0 24 24" class="marca-agua" aria-hidden="true">' + (d || "") + "</svg>";
+}
+
+function tarjetaProducto(p) {
+  const precio = precioTexto(p);
+  const specs = (p.specs && p.specs.length)
+    ? '<dl class="especificaciones">' + p.specs.map(s => "<div><dt>" + s.k + "</dt><dd>" + s.v + "</dd></div>").join("") + "</dl>"
+    : "";
+  const muestras = (p.muestras && p.muestras.length)
+    ? '<div class="muestras">' + p.muestras.map(m =>
+        '<button class="muestra" style="background:' + m.hex + '" title="' + m.nombre + '" aria-label="Color ' + m.nombre + '"></button>'
+      ).join("") + "</div>"
+    : "";
+  const btn3d = p.modelo3d
+    ? '<button class="btn btn-linea btn-mini" data-ver3d="' + p.id + '">Ver en 3D</button>'
+    : "";
+  const img = '<img src="' + p.img + '" alt="' + p.alt + '" loading="lazy" decoding="async" onerror="this.remove()">';
+
+  return '<article class="tarjeta revela">' +
+    (p.nuevo ? '<span class="tarjeta-etiqueta">Nuevo</span>' : "") +
+    '<div class="tarjeta-figura">' + img + iconoGlifo(p.cat) + "</div>" +
+    '<h3 class="tarjeta-nombre">' + p.nombre + "</h3>" +
+    '<p class="tarjeta-resumen">' + (p.resumen || "") + "</p>" +
+    '<p class="tarjeta-precio">' + precio.grande + "<small>" + precio.nota + "</small></p>" +
+    muestras + specs +
+    '<div class="tarjeta-acciones">' + btn3d +
+      '<a class="btn btn-azul btn-mini" href="' + enlaceWA(p) + '" target="_blank" rel="noopener">Consultar</a>' +
+    "</div>" +
+  "</article>";
+}
+
+function seccionCategoria(cat) {
+  const items = PRODUCTOS.filter(p => p.cat === cat.id);
+  if (!items.length) return "";
+  return '<section class="seccion" id="' + cat.id + '">' +
+    '<div class="envoltorio">' +
+      '<div class="cab-sec revela">' +
+        "<div><h2 class=\"titulo-sec\">" + cat.titulo + '</h2><p class="bajada-sec">' + cat.bajada + "</p></div>" +
+        (cat.id !== "accesorios" ? '<a class="enlace-sec" href="#preguntas">Ver todos</a>' : "") +
+      "</div>" +
+      '<div class="carrusel">' +
+        '<div class="flechas">' +
+          '<button data-flecha="' + cat.id + '" data-dir="-1" aria-label="Anterior"><svg viewBox="0 0 36 36"><path d="M22 25c-.38 0-.77-.15-1.06-.44l-5.5-5.5a1.5 1.5 0 0 1 0-2.12l5.5-5.5a1.5 1.5 0 1 1 2.12 2.12L18.6 22l4.34 4.34A1.5 1.5 0 0 1 22 25z" transform="translate(0,-2)"/></svg></button>' +
+          '<button data-flecha="' + cat.id + '" data-dir="1" aria-label="Siguiente"><svg viewBox="0 0 36 36"><path d="M22.56 16.94l-5.51-5.5a1.49 1.49 0 0 0-2.11 0 1.5 1.5 0 0 0 0 2.12L19.38 18l-4.44 4.44a1.5 1.5 0 0 0 2.12 2.12l5.5-5.5a1.5 1.5 0 0 0 0-2.12z" transform="translate(0,-2)"/></svg></button>' +
+        "</div>" +
+        '<div class="pista" data-pista="' + cat.id + '">' + items.map(tarjetaProducto).join("") + "</div>" +
+      "</div>" +
+    "</div>" +
+  "</section>";
+}
+
+function tarjetaArgumento(a) {
+  return '<button class="arg revela" data-argumento="' + a.id + '">' +
+    '<span class="arg-ico"><svg viewBox="0 0 24 24" aria-hidden="true">' + a.icono + "</svg></span>" +
+    "<h3>" + a.titulo + "</h3><p>" + a.texto + "</p>" +
+    '<span class="arg-ver">Saber más</span>' +
+  "</button>";
+}
+
+function pintarCatalogo() {
+  $("#tiraCategorias").innerHTML = CATEGORIAS.map(c =>
+    '<li><a class="tira-item" href="#' + c.id + '">' + c.titulo + "</a></li>"
+  ).join("");
+  $("#catalogo").innerHTML = CATEGORIAS.map(seccionCategoria).join("");
+  $("#rejillaArgs").innerHTML = ARGUMENTOS.map(tarjetaArgumento).join("");
+}
+
+function marcarTira() {
+  const enlaces = $$(".tira-item");
+  if (!enlaces.length) return;
+  const obs = new IntersectionObserver(entradas => {
+    entradas.forEach(e => {
+      if (!e.isIntersecting) return;
+      enlaces.forEach(a => a.classList.toggle("activo", a.getAttribute("href") === "#" + e.target.id));
+    });
+  }, { rootMargin: "-45% 0px -50% 0px" });
+  $$("main section[id]").forEach(s => obs.observe(s));
+}
+
+function revelar() {
+  const obs = new IntersectionObserver(entradas => {
+    entradas.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.classList.add("visible");
+      obs.unobserve(e.target);
+    });
+  }, { rootMargin: "0px 0px -8% 0px" });
+  $$(".revela").forEach(el => obs.observe(el));
+}
+
+function flechasCarrusel() {
+  $$("[data-flecha]").forEach(b => {
+    b.addEventListener("click", () => {
+      const pista = $('[data-pista="' + b.dataset.flecha + '"]');
+      if (!pista) return;
+      const tarjeta = pista.querySelector(".tarjeta");
+      const salto = tarjeta ? tarjeta.offsetWidth + 16 : pista.clientWidth * 0.8;
+      pista.scrollBy({ left: salto * Number(b.dataset.dir), behavior: "smooth" });
     });
   });
 }
 
-function renderProducts() {
-  const grid = document.getElementById('productGrid');
-  const empty = document.getElementById('emptyState');
-  const items = PRODUCTS.filter(p => p.cat === activeCategory);
-
-  empty.classList.toggle('hidden', items.length > 0);
-
-  grid.innerHTML = items.map((p, i) => `
-    <article
-      data-aos="fade-up" data-aos-delay="${(i % 3) * 80}"
-      class="card-lift group bg-panel border border-line rounded-md p-5 flex flex-col justify-between">
-      <div>
-        <div class="flex items-center justify-between mb-4">
-          <span class="spec-tag text-muted">[${escapeHTML(p.sku)}]</span>
-          <span class="spec-tag text-cyan">${escapeHTML(p.catLabel)}</span>
-        </div>
-        <h3 class="font-display font-600 text-xl mb-1">${escapeHTML(p.name)}</h3>
-        <p class="text-muted text-sm">${escapeHTML(p.spec)}</p>
-      </div>
-      <div class="mt-6 flex items-center justify-between">
-        <span class="font-mono text-lg text-ink">${escapeHTML(p.price)}</span>
-        <a href="https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Hola, quiero consultar por: ' + p.name + ' [' + p.sku + ']')}"
-           target="_blank" rel="noopener"
-           class="spec-tag uppercase border border-line px-3 py-2 rounded-sm hover:border-cyan hover:text-cyan transition-colors">
-          Consultar
-        </a>
-      </div>
-    </article>
-  `).join('');
-
-  if (window.AOS) AOS.refreshHard();
+function menuMovil() {
+  const btn = $("#menuBtn"), nav = $("#navAbajo");
+  btn.addEventListener("click", () => {
+    const abierto = document.body.classList.toggle("abierto-menu");
+    btn.setAttribute("aria-expanded", String(abierto));
+    btn.setAttribute("aria-label", abierto ? "Cerrar menú" : "Abrir menú");
+  });
+  nav.addEventListener("click", e => {
+    if (e.target.tagName !== "A") return;
+    document.body.classList.remove("abierto-menu");
+    btn.setAttribute("aria-expanded", "false");
+  });
 }
 
-loadCatalog();
-</script>
+function sombraCabecera() {
+  const cab = $("#cabecera");
+  const alDesplazar = () => cab.classList.toggle("desplaz", window.scrollY > 8);
+  window.addEventListener("scroll", alDesplazar, { passive: true });
+  alDesplazar();
+}
 
-<!-- AOS init -->
-<script src="https://cdn.jsdelivr.net/npm/[email protected]/dist/aos.js"></script>
-<script>
-  AOS.init({ duration: 600, easing: 'ease-out-cubic', once: true, disable: 'reduce-motion' });
-</script>
+function portada() {
+  const destacados = PRODUCTOS.filter(p => p.nuevo && p.modelo3d);
+  const h = destacados[0];
+  $("#anio").textContent = String(new Date().getFullYear());
+  $("#waCabecera").href = enlaceWA(null);
+  $$("[data-wa-general]").forEach(a => { a.href = enlaceWA(null); });
+  if (!h) return;
+  $("#tituloPortada").textContent = h.nombre;
+  $("#subtituloPortada").textContent = h.resumen || "";
+  const btn = $("#btnPortada3d");
+  btn.hidden = false;
+  btn.addEventListener("click", () => abrirVisor(h));
+}
 
+/* ---------------- modal ---------------- */
+
+const modal = $("#modal");
+let focoPrevio = null;
+let visorActivo = null;
+
+function abrirModal({ etiqueta, titulo, sub, cuerpo, pie }) {
+  focoPrevio = document.activeElement;
+  if (visorActivo) { visorActivo.destruir(); visorActivo = null; }
+  $("#modalEtiqueta").textContent = etiqueta || "";
+  $("#modalEtiqueta").hidden = !etiqueta;
+  $("#modalTitulo").textContent = titulo || "";
+  $("#modalSub").textContent = sub || "";
+  $("#modalSub").hidden = !sub;
+  $("#modalCuerpo").innerHTML = cuerpo || "";
+  $("#modalPie").innerHTML = pie || "";
+  modal.hidden = false;
+  document.body.classList.add("abierto");
+  modal.querySelector(".modal-caja").scrollTop = 0;
+  modal.querySelector(".modal-cerrar").focus();
+}
+
+function cerrarModal() {
+  if (modal.hidden) return;
+  modal.hidden = true;
+  document.body.classList.remove("abierto");
+  if (visorActivo) { visorActivo.destruir(); visorActivo = null; }
+  $("#modalCuerpo").innerHTML = "";
+  $("#modalPie").innerHTML = "";
+  if (focoPrevio && focoPrevio.focus) focoPrevio.focus();
+}
+
+modal.addEventListener("click", e => {
+  if (e.target.closest("[data-cerrar]")) cerrarModal();
+});
+document.addEventListener("keydown", e => {
+  if (modal.hidden) return;
+  if (e.key === "Escape") { cerrarModal(); return; }
+  if (e.key !== "Tab") return;
+  const focusables = $$('a[href],button:not([disabled]),[tabindex]:not([tabindex="-1"])', modal)
+    .filter(el => el.getClientRects().length > 0);
+  if (!focusables.length) return;
+  const primero = focusables[0], ultimo = focusables[focusables.length - 1];
+  if (e.shiftKey && document.activeElement === primero) { e.preventDefault(); ultimo.focus(); }
+  else if (!e.shiftKey && document.activeElement === ultimo) { e.preventDefault(); primero.focus(); }
+});
+
+function abrirArgumento(id) {
+  const a = ARGUMENTOS.find(x => x.id === id);
+  if (!a) return;
+  const cuerpo = a.bloques.map(b =>
+    '<div class="bloque"><h4>' + b.t + "</h4><p>" + b.p + "</p></div>"
+  ).join("");
+  abrirModal({
+    etiqueta: "Cómo trabajamos",
+    titulo: a.titulo,
+    sub: a.texto,
+    cuerpo,
+    pie: '<a class="btn btn-azul" href="' + enlaceWA(null) + '" target="_blank" rel="noopener">Consultar por WhatsApp</a>'
+  });
+}
+
+function abrirFicha(id) {
+  const p = PRODUCTOS.find(x => x.id === id);
+  if (!p) return;
+  const specs = (p.specs && p.specs.length)
+    ? '<div class="bloque"><h4>Especificaciones</h4><dl class="especificaciones" style="border:0;margin-top:8px">'
+      + p.specs.map(s => "<div><dt>" + s.k + "</dt><dd>" + s.v + "</dd></div>").join("") + "</dl></div>"
+    : "";
+  const cat = CATEGORIAS.find(c => c.id === p.cat);
+  const cuerpo = specs +
+    '<div class="bloque"><h4>Colores disponibles</h4><p>' +
+      ((p.muestras && p.muestras.length) ? p.muestras.map(m => m.nombre).join(" · ") : "Consultá por WhatsApp.") +
+    "</p></div>";
+  const pie = '<a class="btn btn-azul" href="' + enlaceWA(p) + '" target="_blank" rel="noopener">Consultar este equipo</a>' +
+    (p.modelo3d ? '<button class="btn btn-linea" data-ver3d="' + p.id + '">Ver en 3D</button>' : "");
+  abrirModal({
+    etiqueta: cat ? cat.titulo : "",
+    titulo: p.nombre,
+    sub: p.resumen || "",
+    cuerpo,
+    pie
+  });
+}
+
+/* ---------------- visor 3D ---------------- */
+
+let modulos3d = null;
+const ERRORES3D = {
+  red: "No se pudo cargar three.js. Revisá tu conexión, o probá desde Wi-Fi.",
+  modelo: "No se pudo cargar el modelo 3D. Si el archivo está en otro servidor, revisá que la ruta y los permisos CORS estén bien.",
+  webgl: "Tu navegador no tiene WebGL activado. Podés ver las fotos del equipo igual."
+};
+
+async function modulos() {
+  if (modulos3d) return modulos3d;
+  const [tres, controles, cargador, draco, ktx2, entorno] = await Promise.all([
+    import("three"),
+    import("three/addons/controls/OrbitControls.js"),
+    import("three/addons/loaders/GLTFLoader.js"),
+    import("three/addons/loaders/DRACOLoader.js"),
+    import("three/addons/loaders/KTX2Loader.js"),
+    import("three/addons/environments/RoomEnvironment.js")
+  ]);
+  modulos3d = { tres, controles, cargador, draco, ktx2, entorno };
+  return modulos3d;
+}
+
+function abrirVisor(producto) {
+  if (!producto.modelo3d) return;
+  abrirModal({
+    etiqueta: "Visor 3D",
+    titulo: producto.nombre,
+    sub: "Arrastrá para girar. Usá la rueda o pellizcá para acercar.",
+    cuerpo: '<div class="visor-wrap">' +
+        '<canvas class="visor" id="lienzo"></canvas>' +
+        '<div class="visor-sombra"></div>' +
+        '<div class="visor-estado" id="visorEstado">Cargando el visor…</div>' +
+        '<div class="visor-barra">' +
+          '<button class="visor-mini" id="btnGirar" aria-pressed="true"><span class="girar" id="giroIcono"></span> Girar</button>' +
+          '<div class="grupo">' +
+            '<button class="visor-mini" id="btnMenos" aria-label="Alejar">−</button>' +
+            '<button class="visor-mini" id="btnMas" aria-label="Acercar">+</button>' +
+            '<button class="visor-mini" id="btnRecentrar">Recentrar</button>' +
+          "</div>" +
+        "</div>" +
+      "</div>",
+    pie: '<a class="btn btn-azul" href="' + enlaceWA(producto) + '" target="_blank" rel="noopener">Quiero este</a>' +
+         '<button class="btn btn-linea" data-ficha="' + producto.id + '">Ver ficha</button>' +
+         (producto.modeloCredito ? '<p class="credito">' + producto.modeloCredito + "</p>" : "")
+  });
+
+  const lienzo = $("#lienzo");
+  const estado = $("#visorEstado");
+  const barra = $(".visor-barra");
+
+  let cancelado = false;
+  let api = null;
+
+  function fallar(clave) {
+    estado.hidden = false;
+    estado.innerHTML = "<div><p>" + (ERRORES3D[clave] || "") + "</p></div>";
+    if (barra) barra.style.opacity = "0.35";
+  }
+
+  modulos().then(m => {
+    if (cancelado) return;
+    try {
+      api = crearVisor(m, lienzo, producto, estado, fallar);
+    } catch (e) {
+      fallar("webgl");
+      return;
+    }
+    const controles = api.controles;
+    $("#btnGirar").addEventListener("click", ev => {
+      const activo = !controles.autoRotate;
+      controles.autoRotate = activo;
+      ev.currentTarget.setAttribute("aria-pressed", String(activo));
+      $("#giroIcono").classList.toggle("pausa", !activo);
+    });
+    $("#btnMas").addEventListener("click", () => controles.dollyIn ? controles.dollyIn(1.25) : api.zoom(0.8));
+    $("#btnMenos").addEventListener("click", () => controles.dollyOut ? controles.dollyOut(1.25) : api.zoom(1.25));
+    $("#btnRecentrar").addEventListener("click", api.reencuadrar);
+  }).catch(() => {
+    if (!cancelado) fallar("red");
+  });
+
+  visorActivo = { destruir() { cancelado = true; if (api) api.destruir(); } };
+}
+
+function crearVisor(m, lienzo, producto, estado, fallar) {
+  const T = m.tres;
+
+  let renderer;
+  try {
+    renderer = new T.WebGLRenderer({ canvas: lienzo, antialias: true, alpha: true, powerPreference: "high-performance" });
+  } catch (e) {
+    fallar("webgl");
+    return { controles: { autoRotate: false }, zoom() {}, reencuadrar() {}, destruir() {} };
+  }
+
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.outputColorSpace = T.SRGBColorSpace;
+  renderer.toneMapping = T.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.05;
+
+  const escena = new T.Scene();
+  const camara = new T.PerspectiveCamera(38, 1, 0.01, 1000);
+  camara.position.set(1.4, 1, 1.8);
+
+  const pmrem = new T.PMREMGenerator(renderer);
+  const sala = new m.entorno.RoomEnvironment();
+  const entorno = pmrem.fromScene(sala, 0.04);
+  escena.environment = entorno.texture;
+
+  const clave = new T.DirectionalLight(0xffffff, 1.6);
+  clave.position.set(2, 3, 2);
+  escena.add(clave);
+  escena.add(new T.AmbientLight(0xffffff, 0.25));
+
+  const controles = new m.controles.OrbitControls(camara, lienzo);
+  controles.enableDamping = true;
+  controles.dampingFactor = 0.07;
+  controles.enablePan = false;
+  controles.autoRotate = true;
+  controles.autoRotateSpeed = 1.1;
+  controles.minPolarAngle = 0.15;
+  controles.maxPolarAngle = Math.PI * 0.52;
+  controles.addEventListener("start", () => { controles.autoRotate = false; });
+
+  const baseDRACO = "https://unpkg.com/three@0.186.1/examples/jsm/libs/draco/gltf/";
+  const baseKTX2 = "https://unpkg.com/three@0.186.1/examples/jsm/libs/basis/";
+  const draco = new m.draco.DRACOLoader().setDecoderPath(baseDRACO);
+  const ktx2 = new m.ktx2.KTX2Loader().setTranscoderPath(baseKTX2).detectSupport(renderer);
+  const cargador = new m.cargador.GLTFLoader().setDRACOLoader(draco).setKTX2Loader(ktx2);
+
+  let raiz = null;
+  let Limpios = [];
+  let animando = true;
+  let distanciaBase = 3;
+
+  function conMensaje(texto, conBarra) {
+    estado.hidden = false;
+    estado.innerHTML = "<div>" +
+      (conBarra ? '<div class="progreso"><i id="barraProgreso"></i></div>' : "") +
+      "<p>" + texto + "</p></div>";
+    return $("#barraProgreso");
+  }
+
+  function ocultarEstado() {
+    estado.hidden = true;
+    estado.innerHTML = "";
+  }
+
+  let piezas = [];
+
+  function medirPiezas() {
+    piezas = [];
+    if (!raiz) return;
+    raiz.traverse(malla => {
+      if (!malla.isMesh || !malla.geometry) return;
+      if (!malla.geometry.boundingBox) malla.geometry.computeBoundingBox();
+      const tam = malla.geometry.boundingBox.getSize(new T.Vector3());
+      piezas.push({ malla, mayor: Math.max(tam.x, tam.y, tam.z) });
+    });
+  }
+
+  function ocultarFondo() {
+    medirPiezas();
+    if (!piezas.length) return;
+    let aOcultar = new Set(producto.modeloOcultar || []);
+    if (!aOcultar.size) {
+      const diez = piezas.map(p => p.mayor).sort((x, y) => y - x).slice(0, 10).sort((x, y) => x - y);
+      const mediana = diez[Math.floor(diez.length / 2)];
+      if (mediana > 0) piezas.forEach(p => { if (p.mayor > mediana * 6) aOcultar.add(p.malla.name); });
+    }
+    piezas.forEach(p => { if (aOcultar.has(p.malla.name)) p.malla.visible = false; });
+  }
+
+  function cajaDeProducto() {
+    const caja = new T.Box3();
+    caja.makeEmpty();
+    piezas.forEach(p => {
+      if (!p.malla.visible) return;
+      caja.union(p.malla.geometry.boundingBox.clone().applyMatrix4(p.malla.matrixWorld));
+    });
+    return caja;
+  }
+
+  function encuadrar() {
+    if (!raiz) return;
+    const caja = cajaDeProducto();
+    if (caja.isEmpty()) return;
+    const tam = caja.getSize(new T.Vector3());
+    const maximo = Math.max(tam.x, tam.y, tam.z) || 1;
+    const fov = (camara.fov * Math.PI) / 180;
+    distanciaBase = (maximo / 2) / Math.tan(fov / 2);
+    distanciaBase = Math.max(distanciaBase, 0.1) * 1.5;
+
+    raiz.updateMatrixWorld(true);
+    raiz.position.set(-caja.min.x, -caja.min.y, -caja.min.z);
+    raiz.updateMatrixWorld(true);
+
+    const objetivo = new T.Vector3(0, maximo * 0.42, 0);
+    controles.target.copy(objetivo);
+    const direccion = new T.Vector3(0.8, 0.42, 1).normalize();
+    camara.position.copy(objetivo).addScaledVector(direccion, distanciaBase);
+    camara.near = distanciaBase / 500;
+    camara.far = distanciaBase * 60;
+    camara.updateProjectionMatrix();
+    controles.minDistance = distanciaBase * 0.45;
+    controles.maxDistance = distanciaBase * 4;
+    controles.update();
+  }
+
+  function redimensionar() {
+    const ancho = lienzo.clientWidth || 1;
+    const alto = lienzo.clientHeight || 1;
+    if (lienzo.width !== Math.floor(ancho * renderer.getPixelRatio()) ||
+        lienzo.height !== Math.floor(alto * renderer.getPixelRatio())) {
+      renderer.setSize(ancho, alto, false);
+    }
+    camara.aspect = ancho / alto;
+    camara.updateProjectionMatrix();
+  }
+
+  const observador = new ResizeObserver(redimensionar);
+  observador.observe(lienzo);
+  redimensionar();
+
+  function fotograma() {
+    if (!animando) return;
+    controles.update();
+    renderer.render(escena, camara);
+    id = requestAnimationFrame(fotograma);
+  }
+  let id = 0;
+
+  const barraProgreso = conMensaje("Cargando el modelo…", true);
+  Limpios.push(() => cancelAnimationFrame(id));
+
+  cargador.load(
+    producto.modelo3d,
+    gltf => {
+      if (!estado.isConnected && !raiz) return;
+      raiz = gltf.scene;
+      escena.add(raiz);
+      raiz.updateMatrixWorld(true);
+      ocultarFondo();
+      encuadrar();
+      ocultarEstado();
+    },
+    ev => {
+      if (!barraProgreso || !ev.total) return;
+      barraProgreso.style.width = Math.min(100, Math.round((ev.loaded / ev.total) * 100)) + "%";
+    },
+    () => fallar("modelo")
+  );
+
+  animando = true;
+  fotograma();
+
+  return {
+    controles,
+    zoom(factor) {
+      const dir = camara.position.clone().sub(controles.target);
+      const largo = dir.length() * factor;
+      const nuevo = Math.min(Math.max(largo, controles.minDistance), controles.maxDistance);
+      camara.position.copy(controles.target).add(dir.setLength(nuevo));
+      controles.update();
+    },
+    reencuadrar() { controles.autoRotate = true; encuadrar(); },
+    destruir() {
+      animando = false;
+      Limpios.forEach(fn => { try { fn(); } catch (e) {} });
+      observador.disconnect();
+      controles.dispose();
+      if (raiz) {
+        raiz.traverse(obj => {
+          if (obj.geometry) obj.geometry.dispose();
+          const mats = obj.material ? (Array.isArray(obj.material) ? obj.material : [obj.material]) : [];
+          mats.forEach(mt => {
+            for (const claveMat in mt) {
+              const v = mt[claveMat];
+              if (v && v.isTexture) v.dispose();
+            }
+            mt.dispose();
+          });
+        });
+        escena.remove(raiz);
+      }
+      draco.dispose();
+      ktx2.dispose();
+      if (entorno && entorno.texture) entorno.texture.dispose();
+      sala.traverse && sala.traverse(o => { if (o.geometry) o.geometry.dispose(); });
+      pmrem.dispose();
+      renderer.dispose();
+      if (renderer.forceContextLoss) renderer.forceContextLoss();
+    }
+  };
+}
+
+/* ---------------- arranque ---------------- */
+
+pintarCatalogo();
+revelar();
+marcarTira();
+flechasCarrusel();
+menuMovil();
+sombraCabecera();
+portada();
+
+document.addEventListener("click", e => {
+  const ficha = e.target.closest("[data-ficha]");
+  if (ficha) {
+    const p = PRODUCTOS.find(x => x.id === ficha.dataset.ficha);
+    if (p) abrirFicha(p.id);
+    return;
+  }
+  const ver3d = e.target.closest("[data-ver3d]");
+  if (ver3d) {
+    const p = PRODUCTOS.find(x => x.id === ver3d.dataset.ver3d);
+    if (!p) return;
+    if (p.modelo3d) abrirVisor(p);
+    else abrirFicha(p.id);
+    return;
+  }
+  const arg = e.target.closest("[data-argumento]");
+  if (arg) { abrirArgumento(arg.dataset.argumento); return; }
+});
+
+</script>
 </body>
 </html>

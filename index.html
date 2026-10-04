@@ -150,7 +150,23 @@ ul{padding:0;list-style:none}
 .tarjeta-resumen{font-size:14px;color:var(--txt-2);flex:1}
 .tarjeta-precio{font-size:19px;font-weight:600;letter-spacing:-.02em}
 .tarjeta-precio small{font-size:13px;font-weight:400;color:var(--txt-3);display:block;letter-spacing:0}
-.muestras{display:flex;gap:6px}
+.muestras{display:flex;gap:8px;align-items:center}
+.muestra.activo{outline:2px solid var(--txt);outline-offset:2px}
+.tarjeta-cab{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.marca-chip{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--txt-2)}
+.sucursal{font-size:11px;color:var(--txt-3);border:1px solid var(--linea);border-radius:980px;padding:2px 8px}
+.tarjeta-config{font-size:13px;color:var(--txt-2);margin-top:-6px}
+.tarjeta-precio{font-size:20px;font-weight:600;letter-spacing:-.02em;margin-top:8px}
+.conteo{font-size:13px;color:var(--txt-3);white-space:nowrap}
+.stock{font-size:13px}
+.stock.ok{color:var(--txt-2)}
+.stock.agotado{color:#ff6b6b}
+.tarjeta.exclusivo{border-color:rgba(255,255,255,.28);background:linear-gradient(170deg,#1b1b22,#0e0e12)}
+.pista-3 .tarjeta{grid-auto-columns:minmax(300px,1fr)}
+.filtro{font-size:13px;color:var(--txt-2);padding:7px 15px;border-radius:980px;border:1px solid var(--linea);white-space:nowrap;transition:color .2s,border-color .2s,background .2s}
+.filtro:hover{color:var(--txt);border-color:var(--linea-fuerte)}
+.filtro.activo{color:#000;background:var(--txt);border-color:var(--txt)}
+.tira-filtros{position:sticky;top:52px;z-index:40}
 .muestra{width:15px;height:15px;border-radius:980px;border:1px solid rgba(255,255,255,.28);padding:0}
 .tarjeta-acciones{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
 .especificaciones{margin:2px 0 0;padding:0;border-top:1px solid var(--linea)}
@@ -313,6 +329,12 @@ ul{padding:0;list-style:none}
     </div>
   </nav>
 
+  <nav class="tira tira-filtros" aria-label="Filtrar por marca">
+    <div class="envoltorio">
+      <ul class="tira-lista" id="filtros"></ul>
+    </div>
+  </nav>
+
   <div id="catalogo"></div>
 
   <section class="seccion" id="argumentos">
@@ -434,210 +456,277 @@ ul{padding:0;list-style:none}
 const WHATSAPP_NUMERO = "591000000000";
 
 const CATEGORIAS = [
-  { id: "celulares",     titulo: "Celulares",     bajada: "Los más recientes, con visor 3D para girar el equipo antes de comprarlo." },
-  { id: "laptops",       titulo: "Laptops",       bajada: "Para estudiar, trabajar y jugar." },
-  { id: "linea-blanca",  titulo: "Línea blanca",  bajada: "Refrigeradores, cocinas, lavarropas y más." },
-  { id: "accesorios",    titulo: "Accesorios",    bajada: "Cargadores, fundas, audio y lo que completa el equipo." }
+  { id: "exclusivos", titulo: "Exclusivos 3D", bajada: "Los tres equipos de la vitrina. Se giran, se cambian de color y se ven desde cualquier ángulo." },
+  { id: "celulares",  titulo: "Celulares",  bajada: "Lo que hay en piso, con stock real por sucursal." },
+  { id: "tablets",    titulo: "Tablets",    bajada: "De 8.7 a 14.6 pulgadas, para leer, dibujar o Replacement de notebook." },
+  { id: "laptops",    titulo: "Laptops",    bajada: "" }
 ];
 
-const PRODUCTOS = [
+// Catalogo exportado a CSV en Datos/catalogo.csv, con los 208 SKUs ya limpiados.
+// Foto de cada uno: img/productos/<id>.jpg  (los nombres exactos en Datos/fotos-pendientes.txt)
+
+// Los precios de este archivo ya son venta = costo + USD 5, calculado por la
+// tienda. El CostoUSD NUNCA va en el HTML: si el costo esta publico, el cliente
+// lo divide por el precio y conoce el margen, y te pide el descuento completo.
+// Al tocar un precio, sumale 5 al costo, nunca edites el precio a mano.
+const EXCLUSIVOS = [
   {
     id: "iphone-18-pro-max",
     nombre: "iPhone 18 Pro Max",
-    cat: "celulares",
-    nuevo: true,
-    precioBs: null,
-    resumen: "Pantalla grande, cámara de tres lentes y batería de larga duración.",
-    img: "img/iphone-18-pro-max.jpg",
-    alt: "iPhone 18 Pro Max visto desde atrás",
+    marca: "Apple",
     modelo3d: "modelos/iphone_18_pro_max__high_quality_3d_model.glb",
     modeloOcultar: ["Object_22"],
-    modeloCredito: "Modelo 3D de Pro Animator (Riju.mandal), CC BY 4.0, vía Sketchfab.",
-    muestras: [
-      { nombre: "Naranja cobrizo", hex: "#c8622c" },
+    modeloCredito: "Modelo 3D de Pro Animator (Riju.mandal), CC BY 4.0, via Sketchfab.",
+    resumen: "El flagship del local. Pantalla grande, tres lentes y bateria de larga duracion.",
+    tintables: ["17ProMax_color", "17ProMax_color2", "17ProMax_color3"],
+    colores: [
       { nombre: "Azul profundo", hex: "#1d3557" },
+      { nombre: "Naranja cobrizo", hex: "#c8622c" },
       { nombre: "Plata", hex: "#d9dbe0" }
     ],
-    specs: [
-      { k: "Pantalla", v: "6.9\"" },
-      { k: "Cámaras", v: "Triple trasera" },
-      { k: "Chip", v: "A19 Pro" }
-    ]
+    precioUsd: null
+  },
+  {
+    id: "macbook-pro-14-m5",
+    nombre: 'MacBook Pro 14" M5',
+    marca: "Apple",
+    modelo3d: "modelos/macbook_pro_14-inch_m5.glb",
+    modeloCredito: "Modelo 3D de Apple User, licencia Sketchfab Standard. NO USAR COMERCIALMENTE hasta cambiarlo.",
+    resumen: 'Chip M5 y Liquid Retina XDR en un chassis de aluminio de 14 pulgadas.',
+    tintables: ["zNRfbdNyoCOxSDD", "WiyOPYJEeiHNVjF", "xEcnbqMzoZoLkIZ"],
+    colores: [
+      { nombre: "Negro espacial", hex: "#2b2b2e" },
+      { nombre: "Plata", hex: "#e3e4e8" }
+    ],
+    precioUsd: null
   },
   {
     id: "galaxy-s26-ultra",
     nombre: "Samsung Galaxy S26 Ultra",
-    cat: "celulares",
-    nuevo: true,
-    precioBs: null,
-    resumen: "El más grande de la línea, con pantalla muy alta y stylus incluido.",
-    img: "img/galaxy-s26-ultra.jpg",
-    alt: "Samsung Galaxy S26 Ultra visto desde atrás",
+    marca: "Samsung",
     modelo3d: "modelos/samsung_galaxy_s26_ultra.glb",
     modeloOcultar: ["Object_25", "Object_77"],
-    muestras: [
-      { nombre: "Titanio negro", hex: "#2b2b2e" },
-      { nombre: "Titanio gris", hex: "#8e8e93" },
-      { nombre: "Azul tono", hex: "#4a6fa5" }
+    modeloCredito: "Modelo 3D de zhe_kan, CC BY-NC-SA 4.0. NO USAR COMERCIALMENTE hasta cambiarlo.",
+    resumen: "Pantalla muy alta, lapiz incluido y el mejor zoom de la gama.",
+    tintables: ["Frame_Sky_Blue", "Frame_Sky_Blue.001"],
+    colores: [
+      { nombre: "Azul cielo", hex: "#90c2da" },
+      { nombre: "Grafito", hex: "#4a4d52" },
+      { nombre: "Lima", hex: "#c8d6a0" }
     ],
-    specs: [
-      { k: "Pantalla", v: "6.9\"" },
-      { k: "Cámaras", v: "Cuádruple trasera" },
-      { k: "Batería", v: "5.500 mAh" }
-    ]
-  },
-  {
-    id: "iphone-17",
-    nombre: "iPhone 17",
-    cat: "celulares",
-    nuevo: false,
-    precioBs: null,
-    resumen: "El modelo base de la generación. Cámara doble y tamaño manejable.",
-    img: "img/iphone-17.jpg",
-    alt: "iPhone 17 en color lavanda",
-    modelo3d: null,
-    muestras: [
-      { nombre: "Lavanda", hex: "#b7a5d8" },
-      { nombre: "Salvia", hex: "#a8b5a0" },
-      { nombre: "Negro", hex: "#1c1c1e" }
-    ],
-    specs: [
-      { k: "Pantalla", v: "6.3\"" },
-      { k: "Cámaras", v: "Doble trasera" }
-    ]
-  },
-  {
-    id: "redmi-note-15",
-    nombre: "Xiaomi Redmi Note 15",
-    cat: "celulares",
-    nuevo: false,
-    precioBs: null,
-    resumen: "Mucha pantalla y batería por muy poco. El más vendido de la tienda.",
-    img: "img/redmi-note-15.jpg",
-    alt: "Xiaomi Redmi Note 15",
-    modelo3d: null,
-    muestras: [
-      { nombre: "Azul", hex: "#2b5fa8" },
-      { nombre: "Negro", hex: "#1c1c1e" }
-    ],
-    specs: [
-      { k: "Pantalla", v: "6.7\"" },
-      { k: "Batería", v: "5.000 mAh" }
-    ]
-  },
-
-  {
-    id: "macbook-pro-14-m5",
-    nombre: "MacBook Pro 14\" M5",
-    cat: "laptops",
-    nuevo: true,
-    precioBs: null,
-    resumen: "Pantalla Liquid Retina XDR y chip M5 en un chassis de aluminio.",
-    img: "img/macbook-pro-14-m5.jpg",
-    alt: "MacBook Pro de 14 pulgadas, vista lateral",
-    modelo3d: "modelos/macbook_pro_14-inch_m5.glb",
-    muestras: [
-      { nombre: "Medianoche", hex: "#1d2530" },
-      { nombre: "Estelar", hex: "#e4e0d8" },
-      { nombre: "Plata", hex: "#e3e4e8" }
-    ],
-    specs: [
-      { k: "Pantalla", v: "13.6\"" },
-      { k: "Chip", v: "M4" },
-      { k: "Peso", v: "1.24 kg" }
-    ]
-  },
-  {
-    id: "notebook-gaming",
-    nombre: "Notebook Gaming 15\"",
-    cat: "laptops",
-    nuevo: false,
-    precioBs: null,
-    resumen: "Placa devideo dedicada y refrigeración para sesiones largas.",
-    img: "img/notebook-gaming.jpg",
-    alt: "Notebook gaming de 15 pulgadas",
-    modelo3d: null,
-    muestras: [
-      { nombre: "Negro", hex: "#1c1c1e" }
-    ],
-    specs: [
-      { k: "Pantalla", v: "15.6\"" },
-      { k: "Memoria", v: "16 GB" }
-    ]
-  },
-
-  {
-    id: "nevera-no-frost",
-    nombre: "Refrigerador No Frost 320 L",
-    cat: "linea-blanca",
-    nuevo: true,
-    precioBs: null,
-    resumen: "Dos puertas, sistema no frost y bajo consumo.",
-    img: "img/nevera-no-frost.jpg",
-    alt: "Refrigerador no frost de dos puertas",
-    muestras: [
-      { nombre: "Acero", hex: "#b9bcc0" },
-      { nombre: "Blanco", hex: "#ececed" }
-    ],
-    specs: [
-      { k: "Capacidad", v: "320 L" },
-      { k: "Control", v: "Digital" }
-    ]
-  },
-  {
-    id: "lavarropas-carga-frontal",
-    nombre: "Lavarropas Carga Frontal 18 kg",
-    cat: "linea-blanca",
-    nuevo: false,
-    precioBs: null,
-    resumen: "Carga frontal, centrifugado alto y 12 programas.",
-    img: "img/lavarropas.jpg",
-    alt: "Lavarropas de carga frontal",
-    modelo3d: null,
-    muestras: [
-      { nombre: "Blanco", hex: "#ececed" }
-    ],
-    specs: [
-      { k: "Carga", v: "18 kg" },
-      { k: "Programas", v: "12" }
-    ]
-  },
-
-  {
-    id: "audifonos-pro",
-    nombre: "Audífonos In-ear",
-    cat: "accesorios",
-    nuevo: true,
-    precioBs: null,
-    resumen: "Cancelación de ruido y estuche con carga.",
-    img: "img/audifonos.jpg",
-    alt: "Audífonos in-ear con estuche",
-    muestras: [
-      { nombre: "Blanco", hex: "#ececed" }
-    ],
-    specs: [
-      { k: "Cancelación", v: "Activa" },
-      { k: "Batería", v: "Estuche + audífonos" }
-    ]
-  },
-  {
-    id: "cargador-65w",
-    nombre: "Cargador 65 W USB-C",
-    cat: "accesorios",
-    nuevo: false,
-    precioBs: null,
-    resumen: "Carga el celular, la tablet y la laptop con un solo cable.",
-    img: "img/cargador-65w.jpg",
-    alt: "Cargador de 65 W con cable USB-C",
-    modelo3d: null,
-    muestras: [
-      { nombre: "Blanco", hex: "#ececed" }
-    ],
-    specs: [
-      { k: "Potencia", v: "65 W" },
-      { k: "Conector", v: "USB-C" }
-    ]
+    precioUsd: null
   }
+];
+
+const INVENTARIO = [
+  { id: "redmi-a7-64-4", nombre: "REDMI A7 64/4", marca: "Xiaomi", cat: "celulares", precioUsd: 94.0, sucursal: "NORTE", stock: 5 },
+  { id: "redmi-a5", nombre: "REDMI A5", marca: "Xiaomi", cat: "celulares", precioUsd: 115.0, sucursal: "NORTE", stock: 5 },
+  { id: "redmi-a5-128-4", nombre: "REDMI A5 128/4", marca: "Xiaomi", cat: "celulares", precioUsd: 125.0, sucursal: "NORTE", stock: 5, config: "128 GB / 4 GB RAM" },
+  { id: "redmi-a7-pro-64-4", nombre: "REDMI A7 PRO 64/4", marca: "Xiaomi", cat: "celulares", precioUsd: 95.0, sucursal: "NORTE", stock: 5 },
+  { id: "redmi-a7-pro-128-4", nombre: "REDMI A7 PRO 128/4", marca: "Xiaomi", cat: "celulares", precioUsd: 112.0, sucursal: "NORTE", stock: 5, config: "128 GB / 4 GB RAM" },
+  { id: "redmi-15c-128-4", nombre: "REDMI 15C 128/4", marca: "Xiaomi", cat: "celulares", precioUsd: 127.0, sucursal: "NORTE", stock: 5, config: "128 GB / 4 GB RAM" },
+  { id: "redmi-15c-256-4", nombre: "REDMI 15C 256/4", marca: "Xiaomi", cat: "celulares", precioUsd: 138.0, sucursal: "NORTE", stock: 5, config: "256 GB / 4 GB RAM" },
+  { id: "redmi-15c-256-8", nombre: "REDMI 15C 256/8", marca: "Xiaomi", cat: "celulares", precioUsd: 156.0, sucursal: "NORTE", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "redmi-15-256-8", nombre: "REDMI 15 256/8", marca: "Xiaomi", cat: "celulares", precioUsd: 185.0, sucursal: "NORTE", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "redmi-17-128-4", nombre: "REDMI 17 128/4", marca: "Xiaomi", cat: "celulares", precioUsd: 157.0, sucursal: "NORTE", stock: 5, config: "128 GB / 4 GB RAM" },
+  { id: "redmi-17-256-4", nombre: "REDMI 17 256/4", marca: "Xiaomi", cat: "celulares", precioUsd: 180.0, sucursal: "NORTE", stock: 5, config: "256 GB / 4 GB RAM" },
+  { id: "redmi-note-14-pro-5g-256-8", nombre: "REDMI NOTE 14 PRO 5G 256/8", marca: "Xiaomi", cat: "celulares", precioUsd: 257.0, sucursal: "NORTE", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "redmi-note-15-128-6", nombre: "REDMI NOTE 15 128/6", marca: "Xiaomi", cat: "celulares", precioUsd: 173.0, sucursal: "NORTE", stock: 5, config: "128 GB / 6 GB RAM" },
+  { id: "redmi-note-15-256-8", nombre: "REDMI NOTE 15 256/8", marca: "Xiaomi", cat: "celulares", precioUsd: 195.0, sucursal: "NORTE", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "redmi-note-15-pro-4g", nombre: "REDMI NOTE 15 PRO 4G", marca: "Xiaomi", cat: "celulares", precioUsd: 243.0, sucursal: "NORTE", stock: 5 },
+  { id: "redmi-note-15-pro-5g-256-8", nombre: "REDMI NOTE 15 PRO 5G 256/8", marca: "Xiaomi", cat: "celulares", precioUsd: 293.0, sucursal: "NORTE", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "redmi-note-15-pro-5g-512-8", nombre: "REDMI NOTE 15 PRO 5G 512/8", marca: "Xiaomi", cat: "celulares", precioUsd: 310.0, sucursal: "NORTE", stock: 5, config: "512 GB / 8 GB RAM" },
+  { id: "redmi-note-15-pro-plus-5g-256-8", nombre: "REDMI NOTE 15 PRO + 5G 256/8", marca: "Xiaomi", cat: "celulares", precioUsd: 335.0, sucursal: "NORTE", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "redmi-note-15-pro-plus-5g-512-12", nombre: "REDMI NOTE 15 PRO + 5G 512/12", marca: "Xiaomi", cat: "celulares", precioUsd: 398.0, sucursal: "NORTE", stock: 5, config: "512 GB / 12 GB RAM" },
+  { id: "redmi-pad-2-256-8", nombre: "REDMI PAD 2 256/8", marca: "Xiaomi", cat: "tablets", precioUsd: 210.0, sucursal: "NORTE", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "pad-7-pro-256-8", nombre: "PAD 7 PRO 256/8", marca: "Xiaomi", cat: "tablets", precioUsd: 445.0, sucursal: "NORTE", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "pad-8-256-8", nombre: "PAD 8 256/8", marca: "Xiaomi", cat: "tablets", precioUsd: 425.0, sucursal: "NORTE", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "pad-8-pro-256-8", nombre: "PAD 8 PRO 256/8", marca: "Xiaomi", cat: "tablets", precioUsd: 535.0, sucursal: "NORTE", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "pad-2-pro-256-8", nombre: "PAD 2 PRO 256/8", marca: "Xiaomi", cat: "tablets", precioUsd: 340.0, sucursal: "NORTE", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "xiaomi-17t-512-8", nombre: "XIAOMI 17T 512/8", marca: "Xiaomi", cat: "celulares", precioUsd: 565.0, sucursal: "NORTE", stock: 5, config: "512 GB / 8 GB RAM" },
+  { id: "xiaomi-17t-pro-512-8", nombre: "XIAOMI 17T PRO 512/8", marca: "Xiaomi", cat: "celulares", precioUsd: 725.0, sucursal: "NORTE", stock: 5, config: "512 GB / 8 GB RAM" },
+  { id: "xiaomi-17", nombre: "XIAOMI 17", marca: "Xiaomi", cat: "celulares", precioUsd: 795.0, sucursal: "NORTE", stock: 5 },
+  { id: "xiaomi-17t-pro-12-512", nombre: "XIAOMI 17T PRO 12/512", marca: "Xiaomi", cat: "celulares", precioUsd: 695.0, sucursal: "NORTE", stock: 5, config: "512 GB" },
+  { id: "xiaomi-17t-pro-12-1t", nombre: "XIAOMI 17T PRO 12/1T", marca: "Xiaomi", cat: "celulares", precioUsd: 785.0, sucursal: "NORTE", stock: 5, config: "1 TB" },
+  { id: "xiaomi-17-ultra", nombre: "XIAOMI 17 ULTRA", marca: "Xiaomi", cat: "celulares", precioUsd: 1140.0, sucursal: "NORTE", stock: 5 },
+  { id: "samsung-a06-64-4", nombre: "SAMSUNG A06 64/4", marca: "Samsung", cat: "celulares", precioUsd: 105.0, sucursal: "MALL", stock: 5 },
+  { id: "samsung-a07-64-4", nombre: "SAMSUNG A07 64/4", marca: "Samsung", cat: "celulares", precioUsd: 135.0, sucursal: "MALL", stock: 5 },
+  { id: "samsung-a07-128-4", nombre: "SAMSUNG A07 128/4", marca: "Samsung", cat: "celulares", precioUsd: 155.0, sucursal: "MALL", stock: 4, config: "128 GB / 4 GB RAM" },
+  { id: "samsung-a07-128-6", nombre: "SAMSUNG A07 128/6", marca: "Samsung", cat: "celulares", precioUsd: 165.0, sucursal: "MALL", stock: 2, config: "128 GB / 6 GB RAM" },
+  { id: "samsung-a16-128-4", nombre: "SAMSUNG A16 128/4", marca: "Samsung", cat: "celulares", precioUsd: 147.0, sucursal: "MALL", stock: 5, config: "128 GB / 4 GB RAM" },
+  { id: "samsung-a17-128-6", nombre: "SAMSUNG A17 128/6", marca: "Samsung", cat: "celulares", precioUsd: 195.0, sucursal: "MALL", stock: 5, config: "128 GB / 6 GB RAM" },
+  { id: "samsung-a17-256-8", nombre: "SAMSUNG A17 256/8", marca: "Samsung", cat: "celulares", precioUsd: 255.0, sucursal: "MALL", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "samsung-a26-256-8", nombre: "SAMSUNG A26 256/8", marca: "Samsung", cat: "celulares", precioUsd: 275.0, sucursal: "MALL", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "samsung-a27-256-8", nombre: "SAMSUNG A27 256/8", marca: "Samsung", cat: "celulares", precioUsd: 358.0, sucursal: "MALL", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "samsung-a37-256-8", nombre: "SAMSUNG A37 256/8", marca: "Samsung", cat: "celulares", precioUsd: 415.0, sucursal: "MALL", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "samsung-a56-256-8", nombre: "SAMSUNG A56 256/8", marca: "Samsung", cat: "celulares", precioUsd: 400.0, sucursal: "MALL", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "samsung-a57-256-8", nombre: "SAMSUNG A57 256/8", marca: "Samsung", cat: "celulares", precioUsd: 465.0, sucursal: "MALL", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "samsung-s25-fe-256-8", nombre: "SAMSUNG S25 FE 256/8", marca: "Samsung", cat: "celulares", precioUsd: 665.0, sucursal: "MALL", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "samsung-s25-ultra-25612", nombre: "SAMSUNG S25 ULTRA 25612", marca: "Samsung", cat: "celulares", precioUsd: 1060.0, sucursal: "MALL", stock: 5, config: "256 GB / 12 GB RAM" },
+  { id: "samsung-s25-ultra-512-12", nombre: "SAMSUNG S25 ULTRA 512/12", marca: "Samsung", cat: "celulares", precioUsd: 1160.0, sucursal: "MALL", stock: 5, config: "512 GB / 12 GB RAM" },
+  { id: "samsung-s26-256-12", nombre: "SAMSUNG S26 256/12", marca: "Samsung", cat: "celulares", precioUsd: 815.0, sucursal: "MALL", stock: 5, config: "256 GB / 12 GB RAM" },
+  { id: "samsung-s26plus-256-12", nombre: "SAMSUNG S26+ 256/12", marca: "Samsung", cat: "celulares", precioUsd: 1015.0, sucursal: "MALL", stock: 5, config: "256 GB / 12 GB RAM" },
+  { id: "samsung-s26-ultra-256-12", nombre: "SAMSUNG S26 ULTRA 256/12", marca: "Samsung", cat: "celulares", precioUsd: 1185.0, sucursal: "MALL", stock: 5, config: "256 GB / 12 GB RAM" },
+  { id: "samsung-s26-ultra-512-12", nombre: "SAMSUNG S26 ULTRA 512/12", marca: "Samsung", cat: "celulares", precioUsd: 1355.0, sucursal: "MALL", stock: 4, config: "512 GB / 12 GB RAM" },
+  { id: "samsung-zflip-5-256-8", nombre: "SAMSUNG ZFLIP 5 256/8", marca: "Samsung", cat: "celulares", precioUsd: 505.0, sucursal: "MALL", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "samsung-zflip-7-256-12", nombre: "SAMSUNG ZFLIP 7 256/12", marca: "Samsung", cat: "celulares", precioUsd: 975.0, sucursal: "MALL", stock: 5, config: "256 GB / 12 GB RAM" },
+  { id: "samsung-zfold-5-256-12", nombre: "SAMSUNG ZFOLD 5 256/12", marca: "Samsung", cat: "celulares", precioUsd: 1255.0, sucursal: "MALL", stock: 5, config: "256 GB / 12 GB RAM" },
+  { id: "samsung-zfold-5-512-12", nombre: "SAMSUNG ZFOLD 5 512/12", marca: "Samsung", cat: "celulares", precioUsd: 1405.0, sucursal: "MALL", stock: 5, config: "512 GB / 12 GB RAM" },
+  { id: "samsung-zfold-7-512-12", nombre: "SAMSUNG ZFOLD 7 512/12", marca: "Samsung", cat: "celulares", precioUsd: 1765.0, sucursal: "MALL", stock: 5, config: "512 GB / 12 GB RAM" },
+  { id: "samsung-zflip-8-256-12", nombre: "SAMSUNG ZFLIP 8 256/12", marca: "Samsung", cat: "celulares", precioUsd: 1195.0, sucursal: "MALL", stock: 5, config: "256 GB / 12 GB RAM" },
+  { id: "samsung-zflip-8-512-12", nombre: "SAMSUNG ZFLIP 8 512/12", marca: "Samsung", cat: "celulares", precioUsd: 1345.0, sucursal: "MALL", stock: 5, config: "512 GB / 12 GB RAM" },
+  { id: "samsung-zfold-8-512-12", nombre: "SAMSUNG ZFOLD 8 512/12", marca: "Samsung", cat: "celulares", precioUsd: 1965.0, sucursal: "MALL", stock: 5, config: "512 GB / 12 GB RAM" },
+  { id: "samsung-zfold-8-ultra-256-12", nombre: "SAMSUNG ZFOLD 8 ULTRA 256/12", marca: "Samsung", cat: "celulares", precioUsd: 2085.0, sucursal: "MALL", stock: 5, config: "256 GB / 12 GB RAM" },
+  { id: "samsung-zfold-8-ultra-512-12", nombre: "SAMSUNG ZFOLD 8 ULTRA 512/12", marca: "Samsung", cat: "celulares", precioUsd: 2245.0, sucursal: "MALL", stock: 5, config: "512 GB / 12 GB RAM" },
+  { id: "tab-a9plus-5g-11-64-4", nombre: "TAB A9+ 5G 11 64/4", marca: "Samsung", cat: "tablets", precioUsd: 240.0, sucursal: "MALL", stock: 5 },
+  { id: "tab-a11-8-7-wifi-64-4", nombre: "TAB A11 8.7 WIFI 64/4", marca: "Samsung", cat: "tablets", precioUsd: 170.0, sucursal: "MALL", stock: 5 },
+  { id: "tab-a11-8-7-chip-128-8", nombre: "Tab A11 8.7 CHIP 128/8", marca: "Samsung", cat: "tablets", precioUsd: 215.0, sucursal: "MALL", stock: 5, config: "128 GB / 8 GB RAM" },
+  { id: "tab-a11-plus-5g-11-chip-128-6", nombre: "Tab A11 + 5g 11 CHIP 128/6", marca: "Samsung", cat: "tablets", precioUsd: 265.0, sucursal: "MALL", stock: 5, config: "128 GB / 6 GB RAM", pantalla: "11" },
+  { id: "tab-s6-lite-10-4-64-4", nombre: "Tab S6 lite 10.4 64/4", marca: "Samsung", cat: "tablets", precioUsd: 385.0, sucursal: "MALL", stock: 5 },
+  { id: "tab-s10-lite-5g-11-128-6", nombre: "Tab S10 Lite 5g 11 128/6", marca: "Samsung", cat: "tablets", precioUsd: 485.0, sucursal: "MALL", stock: 5, config: "128 GB / 6 GB RAM" },
+  { id: "tab-s10-fe-11-wifi-128-8", nombre: "Tab S10 FE 11 WIFI 128/8", marca: "Samsung", cat: "tablets", precioUsd: 625.0, sucursal: "MALL", stock: 5, config: "128 GB / 8 GB RAM", pantalla: "11" },
+  { id: "tab-s10-feplus-13-wifi-128-8", nombre: "Tab S10 FE+ 13 WIFI 128/8", marca: "Samsung", cat: "tablets", precioUsd: 795.0, sucursal: "MALL", stock: 5, config: "128 GB / 8 GB RAM", pantalla: "13" },
+  { id: "tab-s8-ultra-wifi", nombre: "Tab S8 Ultra WIFI", marca: "Samsung", cat: "tablets", precioUsd: 905.0, sucursal: "MALL", stock: 5 },
+  { id: "tab-s9-5g-256-12", nombre: "Tab S9 5G 256/12", marca: "Samsung", cat: "tablets", precioUsd: 650.0, sucursal: "MALL", stock: 5, config: "256 GB / 12 GB RAM" },
+  { id: "tab-s10plus-12-4-wifi-256-12", nombre: "Tab S10+ 12.4 WIFI 256/12", marca: "Samsung", cat: "tablets", precioUsd: 950.0, sucursal: "MALL", stock: 5, config: "256 GB / 12 GB RAM", pantalla: "12.4" },
+  { id: "tab-s10-ultra-14-6-wifi-256-12", nombre: "Tab S10 Ultra 14.6 WIFI 256/12", marca: "Samsung", cat: "tablets", precioUsd: 1185.0, sucursal: "MALL", stock: 5, config: "256 GB / 12 GB RAM", pantalla: "14.6" },
+  { id: "tab-s11-11-wifi-256-12", nombre: "Tab S11 11 WIFI 256/12", marca: "Samsung", cat: "tablets", precioUsd: 1035.0, sucursal: "MALL", stock: 5, config: "256 GB / 12 GB RAM", pantalla: "11" },
+  { id: "tab-s11-ultra-14-6-wifi-256-12", nombre: "Tab S11 ultra 14.6 WIFI 256/12", marca: "Samsung", cat: "tablets", precioUsd: 1405.0, sucursal: "MALL", stock: 5, config: "256 GB / 12 GB RAM", pantalla: "14.6" },
+  { id: "motorola-g06-64-4", nombre: "MOTOROLA G06 64/4", marca: "Motorola", cat: "celulares", precioUsd: 105.0, sucursal: "CENTRAL", stock: 4 },
+  { id: "motorola-g15-128-4", nombre: "MOTOROLA G15 128/4", marca: "Motorola", cat: "celulares", precioUsd: 133.0, sucursal: "CENTRAL", stock: 4, config: "128 GB / 4 GB RAM" },
+  { id: "motorola-g15-256-4", nombre: "MOTOROLA G15 256/4", marca: "Motorola", cat: "celulares", precioUsd: 145.0, sucursal: "CENTRAL", stock: 5, config: "256 GB / 4 GB RAM" },
+  { id: "motorola-g15-512-4", nombre: "MOTOROLA G15 512/4", marca: "Motorola", cat: "celulares", precioUsd: 160.0, sucursal: "CENTRAL", stock: 5, config: "512 GB / 4 GB RAM" },
+  { id: "motorola-g17-256-4", nombre: "MOTOROLA G17 256/4", marca: "Motorola", cat: "celulares", precioUsd: 165.0, sucursal: "CENTRAL", stock: 4, config: "256 GB / 4 GB RAM" },
+  { id: "motorola-g35-5g-256-4", nombre: "MOTOROLA G35 5G 256/4", marca: "Motorola", cat: "celulares", precioUsd: 148.0, sucursal: "CENTRAL", stock: 4, config: "256 GB / 4 GB RAM" },
+  { id: "motorola-g56-5g-256-8", nombre: "MOTOROLA G56 5G 256/8", marca: "Motorola", cat: "celulares", precioUsd: 220.0, sucursal: "CENTRAL", stock: 4, config: "256 GB / 8 GB RAM" },
+  { id: "motorola-g75-5g-256-4", nombre: "MOTOROLA G75 5G 256/4", marca: "Motorola", cat: "celulares", precioUsd: 210.0, sucursal: "CENTRAL", stock: 5, config: "256 GB / 4 GB RAM" },
+  { id: "motorola-g17-power", nombre: "MOTOROLA G17 POWER", marca: "Motorola", cat: "celulares", precioUsd: null, sucursal: "CENTRAL", stock: 5 },
+  { id: "motorola-g86-power", nombre: "MOTOROLA G86 POWER", marca: "Motorola", cat: "celulares", precioUsd: 265.0, sucursal: "CENTRAL", stock: 5 },
+  { id: "motorola-g67-5g-power-256-8", nombre: "MOTOROLA G67 5G POWER 256/8", marca: "Motorola", cat: "celulares", precioUsd: 225.0, sucursal: "CENTRAL", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "moto-60-fusion-5g-256-8", nombre: "MOTO 60 FUSION 5G 256/8", marca: "Motorola", cat: "celulares", precioUsd: 275.0, sucursal: "CENTRAL", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "moto-70-fusion-5g-256-8", nombre: "MOTO 70 FUSION 5G 256/8", marca: "Motorola", cat: "celulares", precioUsd: 400.0, sucursal: "CENTRAL", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "moto-razr-60-512-12", nombre: "MOTO RAZR 60 512/12", marca: "Motorola", cat: "celulares", precioUsd: 655.0, sucursal: "CENTRAL", stock: 5, config: "512 GB / 12 GB RAM" },
+  { id: "moto-50-razr-ultra-512-12", nombre: "MOTO 50 RAZR ULTRA 512/12", marca: "Motorola", cat: "celulares", precioUsd: 905.0, sucursal: "CENTRAL", stock: 5, config: "512 GB / 12 GB RAM" },
+  { id: "moto-50-razr-ultra-caja-grande-512-8-12", nombre: "MOTO 50 RAZR ULTRA CAJA GRANDE 512/8/12", marca: "Motorola", cat: "celulares", precioUsd: 925.0, sucursal: "CENTRAL", stock: 5, config: "512 GB / 8 GB RAM" },
+  { id: "moto-60-razr-1t-12", nombre: "MOTO 60 RAZR 1T/12", marca: "Motorola", cat: "celulares", precioUsd: 985.0, sucursal: "CENTRAL", stock: 5, config: "1 TB" },
+  { id: "motorola-signature-1t-16", nombre: "MOTOROLA SIGNATURE 1T/16", marca: "Motorola", cat: "celulares", precioUsd: 1025.0, sucursal: "CENTRAL", stock: 5, config: "1 TB" },
+  { id: "redmi-14c", nombre: "Redmi 14C", marca: "Xiaomi", cat: "celulares", precioUsd: 130.0, sucursal: "CENTRAL", stock: 5 },
+  { id: "tecno-spark-go3-64", nombre: "TECNO SPARK GO3 64", marca: "Tecno", cat: "celulares", precioUsd: 96.0, sucursal: "NORTE", stock: 5 },
+  { id: "tecno-spark-go3-128", nombre: "TECNO SPARK GO3 128", marca: "Tecno", cat: "celulares", precioUsd: 106.0, sucursal: "NORTE", stock: 5, config: "128 GB" },
+  { id: "tecno-spark-50-256", nombre: "TECNO SPARK 50 256", marca: "Tecno", cat: "celulares", precioUsd: 149.0, sucursal: "NORTE", stock: 4, config: "256 GB" },
+  { id: "tecno-sparck-50-5g-256-6", nombre: "TECNO SPARCK 50 5G 256/6", marca: "Tecno", cat: "celulares", precioUsd: 240.0, sucursal: "NORTE", stock: 5, config: "256 GB / 6 GB RAM", pantalla: "50" },
+  { id: "tecno-sparck-50-pro-256-8", nombre: "TECNO SPARCK 50 PRO 256/8", marca: "Tecno", cat: "celulares", precioUsd: 285.0, sucursal: "NORTE", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "tecno-pova-8-pro-5g-256-8", nombre: "TECNO POVA 8 PRO 5G 256/8", marca: "Tecno", cat: "celulares", precioUsd: 343.0, sucursal: "NORTE", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "tecno-pova-8-5g-256-8", nombre: "TECNO POVA 8 5G 256/8", marca: "Tecno", cat: "celulares", precioUsd: 300.0, sucursal: "NORTE", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "tecno-pova-8-pro-lamborgini", nombre: "TECNO POVA 8 PRO LAMBORGINI", marca: "Tecno", cat: "celulares", precioUsd: 355.0, sucursal: "NORTE", stock: 5 },
+  { id: "tecno-camon-50-pro", nombre: "TECNO CAMON 50 PRO", marca: "Tecno", cat: "celulares", precioUsd: 300.0, sucursal: "NORTE", stock: 5 },
+  { id: "pova-curve-2", nombre: "POVA CURVE 2", marca: "Tecno", cat: "celulares", precioUsd: 288.0, sucursal: "NORTE", stock: 5 },
+  { id: "meizu-note-21", nombre: "MEIZU NOTE 21", marca: "Meizu", cat: "celulares", precioUsd: 117.0, sucursal: "NORTE", stock: 5 },
+  { id: "infinix-smart-20-64", nombre: "INFINIX SMART 20 64", marca: "Infinix", cat: "celulares", precioUsd: 100.0, sucursal: "NORTE", stock: 5 },
+  { id: "infinix-smart-20-128", nombre: "INFINIX SMART 20 128", marca: "Infinix", cat: "celulares", precioUsd: 108.0, sucursal: "NORTE", stock: 5, config: "128 GB" },
+  { id: "infinix-hot-70-128-4", nombre: "INFINIX HOT 70 128/4", marca: "Infinix", cat: "celulares", precioUsd: 136.0, sucursal: "NORTE", stock: 4, config: "128 GB / 4 GB RAM" },
+  { id: "infinix-hot-70-256-4", nombre: "INFINIX HOT 70 256/4", marca: "Infinix", cat: "celulares", precioUsd: 151.0, sucursal: "NORTE", stock: 5, config: "256 GB / 4 GB RAM" },
+  { id: "infinix-hot-60-pro-256", nombre: "INFINIX HOT 60 PRO 256", marca: "Infinix", cat: "celulares", precioUsd: 187.0, sucursal: "NORTE", stock: 5, config: "256 GB" },
+  { id: "infinix-hot-60-pro-plus-256", nombre: "INFINIX HOT 60 PRO PLUS 256", marca: "Infinix", cat: "celulares", precioUsd: 211.0, sucursal: "NORTE", stock: 4, config: "256 GB" },
+  { id: "infinix-note-60-256-8", nombre: "INFINIX NOTE 60 256/8", marca: "Infinix", cat: "celulares", precioUsd: 247.0, sucursal: "NORTE", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "infinix-note-60-pro-256", nombre: "INFINIX NOTE 60 PRO 256", marca: "Infinix", cat: "celulares", precioUsd: 330.0, sucursal: "NORTE", stock: 5, config: "256 GB" },
+  { id: "infinix-gt-30-256-8", nombre: "INFINIX GT 30 256/8", marca: "Infinix", cat: "celulares", precioUsd: 222.0, sucursal: "NORTE", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "infinix-gt50-256-12", nombre: "INFINIX GT50 256/12", marca: "Infinix", cat: "celulares", precioUsd: 490.0, sucursal: "NORTE", stock: 5, config: "256 GB / 12 GB RAM" },
+  { id: "zte-a35e-64-2", nombre: "ZTE A35E 64/2", marca: "ZTE", cat: "celulares", precioUsd: 80.0, sucursal: "NORTE", stock: 5 },
+  { id: "zte-a36-64-2", nombre: "ZTE A36 64/2", marca: "ZTE", cat: "celulares", precioUsd: 86.0, sucursal: "NORTE", stock: 5 },
+  { id: "zte-a56-128-4", nombre: "ZTE A56 128/4", marca: "ZTE", cat: "celulares", precioUsd: 99.0, sucursal: "NORTE", stock: 5, config: "128 GB / 4 GB RAM" },
+  { id: "zte-a36-64-4", nombre: "ZTE A36 64/4", marca: "ZTE", cat: "celulares", precioUsd: 91.0, sucursal: "NORTE", stock: 5 },
+  { id: "zte-a56-pro-128", nombre: "ZTE A56 PRO 128", marca: "ZTE", cat: "celulares", precioUsd: 109.0, sucursal: "NORTE", stock: 5, config: "128 GB" },
+  { id: "zte-v80-max-256-4", nombre: "ZTE V80 MAX 256/4", marca: "ZTE", cat: "celulares", precioUsd: 125.0, sucursal: "NORTE", stock: 5, config: "256 GB / 4 GB RAM" },
+  { id: "zte-v80-pro-256-8", nombre: "ZTE V80 PRO 256/8", marca: "ZTE", cat: "celulares", precioUsd: 185.0, sucursal: "NORTE", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "zte-neo-5-256-8", nombre: "ZTE NEO 5 256/8", marca: "ZTE", cat: "celulares", precioUsd: 257.0, sucursal: "NORTE", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "zte-gt-neo-5-256-8", nombre: "ZTE GT NEO 5 256/8", marca: "ZTE", cat: "celulares", precioUsd: 390.0, sucursal: "NORTE", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "honor-x8d", nombre: "HONOR X8D", marca: "Honor", cat: "celulares", precioUsd: 245.0, sucursal: "NORTE", stock: 4 },
+  { id: "honor-x7d-256-6", nombre: "HONOR X7D 256/6", marca: "Honor", cat: "celulares", precioUsd: 192.0, sucursal: "NORTE", stock: 5, config: "256 GB / 6 GB RAM" },
+  { id: "honor-play-10-64", nombre: "HONOR PLAY 10 64", marca: "Honor", cat: "celulares", precioUsd: 95.0, sucursal: "NORTE", stock: 5 },
+  { id: "honor-play-10-128", nombre: "HONOR PLAY 10 128", marca: "Honor", cat: "celulares", precioUsd: 117.0, sucursal: "NORTE", stock: 5, config: "128 GB" },
+  { id: "honor-600-pro-512", nombre: "HONOR 600 PRO 512", marca: "Honor", cat: "celulares", precioUsd: 865.0, sucursal: "NORTE", stock: 5 },
+  { id: "honor-600-512", nombre: "HONOR 600 512", marca: "Honor", cat: "celulares", precioUsd: 665.0, sucursal: "MALL", stock: 5 },
+  { id: "honor-600-256", nombre: "HONOR 600 256", marca: "Honor", cat: "celulares", precioUsd: 605.0, sucursal: "MALL", stock: 5 },
+  { id: "honor-600e-512", nombre: "HONOR 600e 512", marca: "Honor", cat: "celulares", precioUsd: 483.0, sucursal: "MALL", stock: 5, config: "512 GB" },
+  { id: "honor-600e-256", nombre: "HONOR 600e 256", marca: "Honor", cat: "celulares", precioUsd: 434.0, sucursal: "MALL", stock: 5, config: "256 GB" },
+  { id: "honor-magic-8-lite-512", nombre: "HONOR MAGIC 8 LITE 512", marca: "Honor", cat: "celulares", precioUsd: 412.0, sucursal: "MALL", stock: 5, config: "512 GB" },
+  { id: "honor-magic-8-lite-256", nombre: "HONOR MAGIC 8 LITE 256", marca: "Honor", cat: "celulares", precioUsd: 345.0, sucursal: "MALL", stock: 5, config: "256 GB" },
+  { id: "honor-magic-8-pro", nombre: "HONOR MAGIC 8 PRO", marca: "Honor", cat: "celulares", precioUsd: 1230.0, sucursal: "MALL", stock: 5 },
+  { id: "honor-x5c", nombre: "HONOR X5C", marca: "Honor", cat: "celulares", precioUsd: 113.0, sucursal: "MALL", stock: 5 },
+  { id: "honor-x7e", nombre: "HONOR X7e", marca: "Honor", cat: "celulares", precioUsd: 223.0, sucursal: "MALL", stock: 5 },
+  { id: "honor-x6e-256", nombre: "HONOR X6e 256", marca: "Honor", cat: "celulares", precioUsd: 185.0, sucursal: "MALL", stock: 5, config: "256 GB" },
+  { id: "honor-x5d-256-4", nombre: "HONOR X5D 256/4", marca: "Honor", cat: "celulares", precioUsd: 147.0, sucursal: "MALL", stock: 5, config: "256 GB / 4 GB RAM" },
+  { id: "honor-x5d-128", nombre: "HONOR X5D 128", marca: "Honor", cat: "celulares", precioUsd: 135.0, sucursal: "MALL", stock: 5, config: "128 GB" },
+  { id: "honor-x5d-64", nombre: "HONOR X5D 64", marca: "Honor", cat: "celulares", precioUsd: 125.0, sucursal: "MALL", stock: 5 },
+  { id: "honor-x7e-256-6", nombre: "HONOR X7e 256/6", marca: "Honor", cat: "celulares", precioUsd: 220.0, sucursal: "MALL", stock: 5, config: "256 GB / 6 GB RAM" },
+  { id: "honor-x6e-128-4", nombre: "HONOR X6e 128/4", marca: "Honor", cat: "celulares", precioUsd: 158.0, sucursal: "MALL", stock: 5, config: "128 GB / 4 GB RAM" },
+  { id: "honor-x6e-256-4", nombre: "HONOR X6e 256/4", marca: "Honor", cat: "celulares", precioUsd: 179.0, sucursal: "MALL", stock: 5, config: "256 GB / 4 GB RAM" },
+  { id: "honor-x5-plus-256-6", nombre: "HONOR X5 PLUS 256/6", marca: "Honor", cat: "celulares", precioUsd: 149.0, sucursal: "MALL", stock: 5, config: "256 GB / 6 GB RAM" },
+  { id: "honor-pad-10256-8", nombre: "HONOR PAD 10256/8", marca: "Honor", cat: "tablets", precioUsd: 505.0, sucursal: "MALL", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "honor-pad-x8b-128-4", nombre: "HONOR PAD X8b 128/4", marca: "Honor", cat: "tablets", precioUsd: 268.0, sucursal: "MALL", stock: 5, config: "128 GB / 4 GB RAM" },
+  { id: "honor-pad-x7", nombre: "HONOR PAD X7", marca: "Honor", cat: "tablets", precioUsd: 160.0, sucursal: "MALL", stock: 5 },
+  { id: "honor-pad-x8a", nombre: "HONOR PAD X8a", marca: "Honor", cat: "tablets", precioUsd: 235.0, sucursal: "MALL", stock: 5 },
+  { id: "honor-pad-x9a", nombre: "HONOR PAD x9a", marca: "Honor", cat: "tablets", precioUsd: 415.0, sucursal: "MALL", stock: 5 },
+  { id: "honor-pad-x9a-2", nombre: "HONOR PAD X9a", marca: "Honor", cat: "tablets", precioUsd: 455.0, sucursal: "MALL", stock: 5 },
+  { id: "realme-note-70-256-8", nombre: "REALME NOTE 70 256/8", marca: "Realme", cat: "celulares", precioUsd: 150.0, sucursal: "SUR", stock: 1, config: "256 GB / 8 GB RAM" },
+  { id: "realme-note-70-128-4", nombre: "REALME NOTE 70 128/4", marca: "Realme", cat: "celulares", precioUsd: 112.0, sucursal: "SUR", stock: 5, config: "128 GB / 4 GB RAM" },
+  { id: "realme-c71-256-8", nombre: "REALME C71 256/8", marca: "Realme", cat: "celulares", precioUsd: 160.0, sucursal: "SUR", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "realme-c85-256-8", nombre: "REALME C85 256/8", marca: "Realme", cat: "celulares", precioUsd: 215.0, sucursal: "SUR", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "realme-13-5g-256-12", nombre: "REALME 13 5G 256/12", marca: "Realme", cat: "celulares", precioUsd: 225.0, sucursal: "SUR", stock: 5, config: "256 GB / 12 GB RAM", pantalla: "13" },
+  { id: "realme-14t-256-8", nombre: "REALME 14T 256/8", marca: "Realme", cat: "celulares", precioUsd: 220.0, sucursal: "SUR", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "realme-14-5g-256-8", nombre: "REALME 14 5G 256/8", marca: "Realme", cat: "celulares", precioUsd: 250.0, sucursal: "SUR", stock: 5, config: "256 GB / 8 GB RAM", pantalla: "14" },
+  { id: "realme-16-pro-512-12", nombre: "REALME 16 PRO 512/12", marca: "Realme", cat: "celulares", precioUsd: 396.0, sucursal: "SUR", stock: 5, config: "512 GB / 12 GB RAM" },
+  { id: "realme-16-pro-plus", nombre: "REALME 16 PRO PLUS", marca: "Realme", cat: "celulares", precioUsd: 545.0, sucursal: "SUR", stock: 5 },
+  { id: "realme-16-5g", nombre: "REALME 16 5G", marca: "Realme", cat: "celulares", precioUsd: 318.0, sucursal: "SUR", stock: 5, pantalla: "16" },
+  { id: "realme-p4-power-512-12", nombre: "REALME P4 POWER 512/12", marca: "Realme", cat: "celulares", precioUsd: 467.0, sucursal: "SUR", stock: 5, config: "512 GB / 12 GB RAM" },
+  { id: "ipad-air-11-m4-256", nombre: "IPAD AIR 11 M4 256", marca: "Apple", cat: "tablets", precioUsd: 895.0, sucursal: "ESTE", stock: 5, config: "256 GB" },
+  { id: "ipad-air-13-m4-256", nombre: "IPAD AIR 13 M4 256", marca: "Apple", cat: "tablets", precioUsd: 1090.0, sucursal: "ESTE", stock: 5, config: "256 GB" },
+  { id: "ipad-pro-11-m5-256", nombre: "IPAD PRO 11 M5 256", marca: "Apple", cat: "tablets", precioUsd: 1225.0, sucursal: "ESTE", stock: 5, config: "256 GB" },
+  { id: "macbook-air-13-m5-512-16", nombre: "MACBOOK AIR 13 M5 512/16", marca: "Apple", cat: "laptops", precioUsd: 1325.0, sucursal: "ESTE", stock: 5, config: "512 GB / 16 GB RAM" },
+  { id: "iphone-17-pro-256-chip", nombre: "IPHONE 17 PRO 256 CHIP", marca: "Apple", cat: "celulares", precioUsd: 1240.0, sucursal: "ESTE", stock: 5, config: "256 GB" },
+  { id: "iphone-17-pro-max-256-chip-azul", nombre: "IPHONE 17 PRO MAX 256 CHIP AZUL", marca: "Apple", cat: "celulares", precioUsd: 1340.0, sucursal: "ESTE", stock: 5, config: "256 GB" },
+  { id: "iphone-17-pro-max-256-chip-blanco", nombre: "IPHONE 17 PRO MAX 256 CHIP BLANCO", marca: "Apple", cat: "celulares", precioUsd: 1350.0, sucursal: "ESTE", stock: 5, config: "256 GB" },
+  { id: "iphone-17-pro-max-512-chip-blanco", nombre: "IPHONE 17 PRO MAX 512 CHIP BLANCO", marca: "Apple", cat: "celulares", precioUsd: 1570.0, sucursal: "ESTE", stock: 5, config: "512 GB" },
+  { id: "iphone-17-256-esim-jp", nombre: "IPHONE 17 256 Esim JP", marca: "Apple", cat: "celulares", precioUsd: 877.0, sucursal: "ESTE", stock: 5, config: "256 GB" },
+  { id: "iphone-17-256-esim-jp-lila", nombre: "IPHONE 17 256 Esim JP lila", marca: "Apple", cat: "celulares", precioUsd: 880.0, sucursal: "ESTE", stock: 5, config: "256 GB" },
+  { id: "iphone-17-pro-esim", nombre: "IPHONE 17 PRO Esim", marca: "Apple", cat: "celulares", precioUsd: 1145.0, sucursal: "ESTE", stock: 5 },
+  { id: "iphone-17-pro-esim-blanco", nombre: "IPHONE 17 PRO Esim Blanco", marca: "Apple", cat: "celulares", precioUsd: 1155.0, sucursal: "ESTE", stock: 5 },
+  { id: "iphone-17-pro-max-esim-256", nombre: "IPHONE 17 PRO MAX Esim 256", marca: "Apple", cat: "celulares", precioUsd: 1245.0, sucursal: "ESTE", stock: 5, config: "256 GB" },
+  { id: "iphone-17-pro-max-esim-256-blanco", nombre: "IPHONE 17 PRO MAX Esim 256 blanco", marca: "Apple", cat: "celulares", precioUsd: 1245.0, sucursal: "ESTE", stock: 5, config: "256 GB" },
+  { id: "iphone-17-pro-max-512-esim-jp", nombre: "IPHONE 17 PRO MAX 512 Esim JP", marca: "Apple", cat: "celulares", precioUsd: 1430.0, sucursal: "ESTE", stock: 5, config: "512 GB" },
+  { id: "iphone-17-pro-max-esim-256-2", nombre: "IPHONE 17 PRO MAX Esim 256", marca: "Apple", cat: "celulares", precioUsd: 1435.0, sucursal: "ESTE", stock: 5, config: "256 GB" },
+  { id: "iphone-17-pro-max-esim-1t", nombre: "IPHONE 17 PRO MAX Esim 1T", marca: "Apple", cat: "celulares", precioUsd: 1655.0, sucursal: "ESTE", stock: 5, config: "1 TB" },
+  { id: "iphone-14-pro-max-256-chip-caja-blanca", nombre: "IPHONE 14 PRO MAX 256 CHIP CAJA BLANCA", marca: "Apple", cat: "celulares", precioUsd: 845.0, sucursal: "ESTE", stock: 5, config: "256 GB" },
+  { id: "iphone-15-pro-max-256-chip-caja-blanca", nombre: "IPHONE 15 PRO MAX 256 CHIP caja blanca", marca: "Apple", cat: "celulares", precioUsd: 945.0, sucursal: "ESTE", stock: 5, config: "256 GB" },
+  { id: "iphone-16-pro-max-256-esim-caja-blanca", nombre: "IPHONE 16 PRO MAX 256 Esim caja blanca", marca: "Apple", cat: "celulares", precioUsd: 1040.0, sucursal: "ESTE", stock: 5, config: "256 GB" },
+  { id: "poco-x8-pro-max-512-12", nombre: "POCO X8 PRO MAX 512/12", marca: "Xiaomi", cat: "celulares", precioUsd: 503.0, sucursal: "SUR", stock: 5, config: "512 GB / 12 GB RAM" },
+  { id: "poco-x8-pro-256-8", nombre: "POCO X8 PRO 256/8", marca: "Xiaomi", cat: "celulares", precioUsd: 343.0, sucursal: "SUR", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "poco-x8-pro-512-12", nombre: "POCO X8 PRO 512/12", marca: "Xiaomi", cat: "celulares", precioUsd: 403.0, sucursal: "SUR", stock: 5, config: "512 GB / 12 GB RAM" },
+  { id: "poco-x7-pro-512-12", nombre: "POCO X7 PRO 512/12", marca: "Xiaomi", cat: "celulares", precioUsd: 333.0, sucursal: "SUR", stock: 5, config: "512 GB / 12 GB RAM" },
+  { id: "poco-m8-pro-512-12", nombre: "POCO M8 PRO 512/12", marca: "Xiaomi", cat: "celulares", precioUsd: 310.0, sucursal: "SUR", stock: 5, config: "512 GB / 12 GB RAM" },
+  { id: "poco-c85-256-8", nombre: "POCO C85 256/8", marca: "Xiaomi", cat: "celulares", precioUsd: 157.0, sucursal: "SUR", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "poco-c81-pro-128-4", nombre: "POCO C81 PRO 128/4", marca: "Xiaomi", cat: "celulares", precioUsd: 120.0, sucursal: "SUR", stock: 5, config: "128 GB / 4 GB RAM" },
+  { id: "poco-c71-128-4", nombre: "POCO C71 128/4", marca: "Xiaomi", cat: "celulares", precioUsd: 120.0, sucursal: "SUR", stock: 5, config: "128 GB / 4 GB RAM" },
+  { id: "poco-c81-pro-64-4", nombre: "POCO C81 PRO 64/4", marca: "Xiaomi", cat: "celulares", precioUsd: 105.0, sucursal: "SUR", stock: 5 },
+  { id: "cubot-mini-4-128-6", nombre: "CUBOT MINI 4 128/6", marca: "Cubot", cat: "celulares", precioUsd: 155.0, sucursal: "NORTE", stock: 5, config: "128 GB / 6 GB RAM" },
+  { id: "cubot-kinkong-3-256-6", nombre: "CUBOT KINKONG 3 256/6", marca: "Cubot", cat: "celulares", precioUsd: 165.0, sucursal: "NORTE", stock: 5, config: "256 GB / 6 GB RAM" },
+  { id: "cubot-p90-256-16", nombre: "CUBOT P90 256/16", marca: "Cubot", cat: "celulares", precioUsd: 185.0, sucursal: "NORTE", stock: 5, config: "256 GB / 16 GB RAM" },
+  { id: "cubot-kinkonges-5-128-6", nombre: "CUBOT KINKONGES 5 128/6", marca: "Cubot", cat: "celulares", precioUsd: 155.0, sucursal: "NORTE", stock: 5, config: "128 GB / 6 GB RAM" },
+  { id: "cubot-kinkon-11-256-16", nombre: "CUBOT KINKON 11 256/16", marca: "Cubot", cat: "celulares", precioUsd: 275.0, sucursal: "NORTE", stock: 5, config: "256 GB / 16 GB RAM" },
+  { id: "cubot-note-60-128-6", nombre: "CUBOT NOTE 60 128/6", marca: "Cubot", cat: "celulares", precioUsd: 130.0, sucursal: "NORTE", stock: 5, config: "128 GB / 6 GB RAM" },
+  { id: "cubot-kinkones-pro-128-6", nombre: "CUBOT KINKONES PRO 128/6", marca: "Cubot", cat: "celulares", precioUsd: 140.0, sucursal: "NORTE", stock: 5, config: "128 GB / 6 GB RAM" },
+  { id: "cubot-tab-kinkon-128-6", nombre: "CUBOT TAB KINKON 128/6", marca: "Cubot", cat: "tablets", precioUsd: 225.0, sucursal: "NORTE", stock: 5, config: "128 GB / 6 GB RAM" },
+  { id: "cubot-tab-kinkon-2-256-8", nombre: "CUBOT TAB KINKON 2 256/8", marca: "Cubot", cat: "tablets", precioUsd: 255.0, sucursal: "NORTE", stock: 5, config: "256 GB / 8 GB RAM" },
+  { id: "cubot-tab-mini-4-128-6", nombre: "CUBOT TAB MINI 4 128/6", marca: "Cubot", cat: "tablets", precioUsd: 165.0, sucursal: "NORTE", stock: 5, config: "128 GB / 6 GB RAM" },
+  { id: "samsung-s21-plus-128-8-homo", nombre: "Samsung S21 + 128/8 homo", marca: "Samsung", cat: "celulares", precioUsd: 310.0, sucursal: "NORTE", stock: 5, config: "128 GB / 8 GB RAM" },
+  { id: "black-shark-128-6", nombre: "BLACK SHARK 128/6", marca: "Black Shark", cat: "celulares", precioUsd: 180.0, sucursal: "MALL", stock: 5, config: "128 GB / 6 GB RAM" },
+  { id: "black-shark-pro-6-256", nombre: "BLACK SHARK PRO 6 256", marca: "Black Shark", cat: "celulares", precioUsd: 220.0, sucursal: "MALL", stock: 5, config: "256 GB" },
+  { id: "tcl-60-np-512-8", nombre: "TCL 60 NP 512/8", marca: "TCL", cat: "celulares", precioUsd: 195.0, sucursal: "CENTRAL", stock: 5, config: "512 GB / 8 GB RAM" },
+  { id: "tcl-50-pro-512-8", nombre: "TCL 50 PRO 512/8", marca: "TCL", cat: "celulares", precioUsd: 235.0, sucursal: "CENTRAL", stock: 5, config: "512 GB / 8 GB RAM" },
+  { id: "tcl-60-ultra-512-12", nombre: "TCL 60 ULTRA 512/12", marca: "TCL", cat: "celulares", precioUsd: 460.0, sucursal: "CENTRAL", stock: 5, config: "512 GB / 12 GB RAM" },
+  { id: "tcl-tab-14np", nombre: "TCL TAB 14np", marca: "TCL", cat: "tablets", precioUsd: 405.0, sucursal: "CENTRAL", stock: 5 },
+  { id: "tcl-tab-gen-2", nombre: "TCL TAB GEN 2", marca: "TCL", cat: "tablets", precioUsd: 255.0, sucursal: "CENTRAL", stock: 5 },
 ];
 
 const ARGUMENTOS = [
@@ -684,70 +773,114 @@ const ARGUMENTOS = [
 ];
 
 const MONEDA = new Intl.NumberFormat("es-BO", { maximumFractionDigits: 0 });
+const USD = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
 
 const $ = (sel, raiz = document) => raiz.querySelector(sel);
 const $$ = (sel, raiz = document) => Array.from(raiz.querySelectorAll(sel));
 
+let marcaActiva = "todas";
+
 function precioTexto(p) {
-  if (p.precioBs === null || p.precioBs === undefined) return { grande: "Consultar", nota: "precio a confirmar" };
-  return { grande: "Bs " + MONEDA.format(p.precioBs), nota: "o hasta 12 cuotas" };
+  if (p.precioUsd === null || p.precioUsd === undefined) return { grande: "Consultar", nota: "disponibilidad por confirmar" };
+  return { grande: "USD " + USD.format(p.precioUsd), nota: "el precio en Bs varía según el dólar" };
 }
 
 function enlaceWA(producto) {
   const base = "https://wa.me/" + WHATSAPP_NUMERO;
   if (!producto) return base + "?text=" + encodeURIComponent("Hola, consulto por un equipo en Moon Tech Mobile.");
-  const partes = ["Hola, consulto por este equipo:", "• " + producto.nombre];
-  if (producto.precioBs != null) partes.push("• Precio publicado: Bs " + MONEDA.format(producto.precioBs));
-  if (producto.muestras && producto.muestras.length) partes.push("• Color: " + producto.muestras.map(m => m.nombre).join(" / "));
+  const partes = ["Hola, consulto por este equipo:", "• " + (producto.nombre || "")];
+  if (producto.precioUsd != null) partes.push("• Precio publicado: USD " + USD.format(producto.precioUsd));
+  if (producto.marca) partes.push("• Marca: " + producto.marca);
+  if (producto.config) partes.push("• " + producto.config);
+  if (producto.sucursal) partes.push("• Sucursal: " + producto.sucursal);
+  if (producto.stock) partes.push("• Stock: " + producto.stock + " unidades");
   return base + "?text=" + encodeURIComponent(partes.join("\n"));
 }
 
 function iconoGlifo(cat) {
   const d = {
     celulares: '<rect x="7" y="2.5" width="10" height="19" rx="2.4"/><path d="M10.6 5.4h2.8"/>',
+    tablets: '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M10.5 18.4h3"/>',
     laptops: '<rect x="4" y="5" width="16" height="10.5" rx="1.4"/><path d="M2 18.4h20"/>',
-    "linea-blanca": '<rect x="5" y="2.5" width="14" height="19" rx="1.6"/><path d="M5 9.6h14M8.4 6h1.6M8.4 12.8h1.6"/>',
-    accesorios: '<path d="M6 8.6h12v6.2a5 5 0 0 1-5 5h-2a5 5 0 0 1-5-5z"/><path d="M6 11.4H4.2a2.4 2.4 0 0 1 0-4.8H6M18 11.4h1.8a2.4 2.4 0 0 0 0-4.8H18"/>'
+    "línea blanca": '<rect x="5" y="2.5" width="14" height="19" rx="1.6"/><path d="M5 9.6h14M8.4 6h1.6M8.4 12.8h1.6"/>',
+    accesorios: '<path d="M6 8.6h12v6.2a5 5 0 0 1-5 5h-2a5 5 0 0 1-5-5z"/><path d="M6 11.4H4.2a2.4 2.4 0 0 1 0-4.8H6M18 11.4h1.8a2.4 2.4 0 0 0 0-4.8H18"/>',
+    exclusivos: '<path d="M12 2.6l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.5 6.1 20.6l1.2-6.5L2.5 9.5l6.6-.9z"/>'
   }[cat];
   return '<svg viewBox="0 0 24 24" class="marca-agua" aria-hidden="true">' + (d || "") + "</svg>";
 }
 
+function filaDatos(etiqueta, valor) {
+  if (!valor) return "";
+  return "<div><dt>" + etiqueta + "</dt><dd>" + valor + "</dd></div>";
+}
+
 function tarjetaProducto(p) {
   const precio = precioTexto(p);
-  const specs = (p.specs && p.specs.length)
-    ? '<dl class="especificaciones">' + p.specs.map(s => "<div><dt>" + s.k + "</dt><dd>" + s.v + "</dd></div>").join("") + "</dl>"
-    : "";
-  const muestras = (p.muestras && p.muestras.length)
-    ? '<div class="muestras">' + p.muestras.map(m =>
-        '<button class="muestra" style="background:' + m.hex + '" title="' + m.nombre + '" aria-label="Color ' + m.nombre + '"></button>'
-      ).join("") + "</div>"
-    : "";
-  const btn3d = p.modelo3d
-    ? '<button class="btn btn-linea btn-mini" data-ver3d="' + p.id + '">Ver en 3D</button>'
-    : "";
-  const img = '<img src="' + p.img + '" alt="' + p.alt + '" loading="lazy" decoding="async" onerror="this.remove()">';
-
-  return '<article class="tarjeta revela">' +
-    (p.nuevo ? '<span class="tarjeta-etiqueta">Nuevo</span>' : "") +
-    '<div class="tarjeta-figura">' + img + iconoGlifo(p.cat) + "</div>" +
+  const stock = p.stock ? (p.stock > 0 ? '<span class="stock ok">' + p.stock + " disponibles</span>" : '<span class="stock agotado">Sin stock</span>') : "";
+  return '<article class="tarjeta">' +
+    '<div class="tarjeta-cab">' +
+      '<span class="marca-chip">' + p.marca + "</span>" +
+      '<span class="sucursal">' + p.sucursal + "</span>" +
+    "</div>" +
+    '<div class="tarjeta-figura">' +
+      '<img src="img/' + p.id + '.jpg" alt="' + p.nombre + '" loading="lazy" decoding="async" onerror="this.remove()">' +
+      iconoGlifo(p.cat) +
+    "</div>" +
     '<h3 class="tarjeta-nombre">' + p.nombre + "</h3>" +
-    '<p class="tarjeta-resumen">' + (p.resumen || "") + "</p>" +
+    (p.config ? '<p class="tarjeta-config">' + p.config + "</p>" : "") +
     '<p class="tarjeta-precio">' + precio.grande + "<small>" + precio.nota + "</small></p>" +
-    muestras + specs +
-    '<div class="tarjeta-acciones">' + btn3d +
+    '<dl class="especificaciones">' +
+      filaDatos("Sucursal", p.sucursal) +
+      filaDatos("Stock", stock) +
+      filaDatos("Pantalla", p.pantalla ? p.pantalla + '"' : "") +
+    "</dl>" +
+    '<div class="tarjeta-acciones">' +
       '<a class="btn btn-azul btn-mini" href="' + enlaceWA(p) + '" target="_blank" rel="noopener">Consultar</a>' +
+      '<button class="btn btn-linea btn-mini" data-ficha="' + p.id + '">Ficha</button>' +
+    "</div>" +
+  "</article>";
+}
+
+function tarjetaExclusivo(x) {
+  const precio = precioTexto(x);
+  return '<article class="tarjeta exclusivo">' +
+    '<span class="tarjeta-etiqueta">3D</span>' +
+    '<div class="tarjeta-figura">' +
+      '<img src="img/' + x.id + '.jpg" alt="' + x.nombre + '" loading="lazy" decoding="async" onerror="this.remove()">' +
+      iconoGlifo("exclusivos") +
+    "</div>" +
+    '<h3 class="tarjeta-nombre">' + x.nombre + "</h3>" +
+    '<p class="tarjeta-resumen">' + x.resumen + "</p>" +
+    '<p class="tarjeta-precio">' + precio.grande + "<small>" + precio.nota + "</small></p>" +
+    '<div class="muestras">' + (x.colores || []).map((c, i) =>
+      '<button class="muestra' + (i === 0 ? " activo" : "") + '" data-color="' + x.id + '" data-hex="' + c.hex + '" data-nombre="' + c.nombre + '" style="background:' + c.hex + '" title="' + c.nombre + '" aria-label="Color ' + c.nombre + '"></button>'
+    ).join("") + "</div>" +
+    '<div class="tarjeta-acciones">' +
+      '<button class="btn btn-azul btn-mini" data-ver3d="' + x.id + '">Ver en 3D</button>' +
+      '<a class="btn btn-linea btn-mini" href="' + enlaceWA(x) + '" target="_blank" rel="noopener">Consultar</a>' +
     "</div>" +
   "</article>";
 }
 
 function seccionCategoria(cat) {
-  const items = PRODUCTOS.filter(p => p.cat === cat.id);
+  if (cat.id === "exclusivos") {
+    return '<section class="seccion" id="exclusivos">' +
+      '<div class="envoltorio">' +
+        '<div class="cab-sec revela">' +
+          "<div><h2 class=\"titulo-sec\">" + cat.titulo + '</h2><p class="bajada-sec">' + cat.bajada + "</p></div>" +
+        "</div>" +
+        '<div class="carrusel"><div class="pista pista-3">' + EXCLUSIVOS.map(tarjetaExclusivo).join("") + "</div></div>" +
+      "</div>" +
+    "</section>";
+  }
+  const items = INVENTARIO.filter(p => p.cat === cat.id && (marcaActiva === "todas" || p.marca === marcaActiva));
   if (!items.length) return "";
   return '<section class="seccion" id="' + cat.id + '">' +
     '<div class="envoltorio">' +
-      '<div class="cab-sec revela">' +
-        "<div><h2 class=\"titulo-sec\">" + cat.titulo + '</h2><p class="bajada-sec">' + cat.bajada + "</p></div>" +
-        (cat.id !== "accesorios" ? '<a class="enlace-sec" href="#preguntas">Ver todos</a>' : "") +
+      '<div class="cab-sec">' +
+        "<div><h2 class=\"titulo-sec\">" + cat.titulo + "</h2>" +
+        (cat.bajada ? '<p class="bajada-sec">' + cat.bajada + "</p>" : "") + "</div>" +
+        '<span class="conteo">' + items.length + " modelo" + (items.length === 1 ? "" : "s") + "</span>" +
       "</div>" +
       '<div class="carrusel">' +
         '<div class="flechas">' +
@@ -758,6 +891,13 @@ function seccionCategoria(cat) {
       "</div>" +
     "</div>" +
   "</section>";
+}
+
+function pintarFiltros() {
+  const marcas = Array.from(new Set(INVENTARIO.map(p => p.marca))).sort((a, b) => a.localeCompare(b));
+  $("#filtros").innerHTML = ['<button class="filtro activo" data-marca="todas">Todas</button>']
+    .concat(marcas.map(m => '<button class="filtro" data-marca="' + m + '">' + m + "</button>"))
+    .join("");
 }
 
 function tarjetaArgumento(a) {
@@ -833,8 +973,7 @@ function sombraCabecera() {
 }
 
 function portada() {
-  const destacados = PRODUCTOS.filter(p => p.nuevo && p.modelo3d);
-  const h = destacados[0];
+  const h = EXCLUSIVOS[0];
   $("#anio").textContent = String(new Date().getFullYear());
   $("#waCabecera").href = enlaceWA(null);
   $$("[data-wa-general]").forEach(a => { a.href = enlaceWA(null); });
@@ -909,24 +1048,29 @@ function abrirArgumento(id) {
 }
 
 function abrirFicha(id) {
-  const p = PRODUCTOS.find(x => x.id === id);
+  const p = INVENTARIO.find(x => x.id === id) || EXCLUSIVOS.find(x => x.id === id);
   if (!p) return;
-  const specs = (p.specs && p.specs.length)
-    ? '<div class="bloque"><h4>Especificaciones</h4><dl class="especificaciones" style="border:0;margin-top:8px">'
-      + p.specs.map(s => "<div><dt>" + s.k + "</dt><dd>" + s.v + "</dd></div>").join("") + "</dl></div>"
-    : "";
-  const cat = CATEGORIAS.find(c => c.id === p.cat);
-  const cuerpo = specs +
-    '<div class="bloque"><h4>Colores disponibles</h4><p>' +
-      ((p.muestras && p.muestras.length) ? p.muestras.map(m => m.nombre).join(" · ") : "Consultá por WhatsApp.") +
-    "</p></div>";
+  const bloques = [];
+  if (p.config || p.pantalla) {
+    bloques.push('<div class="bloque"><h4>Ficha</h4><dl class="especificaciones" style="border:0;margin-top:8px">' +
+      filaDatos("Marca", p.marca) + filaDatos("Configuracion", p.config) + filaDatos("Pantalla", p.pantalla ? p.pantalla + '"' : "") +
+      "</dl></div>");
+  }
+  if (p.sucursal) {
+    bloques.push('<div class="bloque"><h4>Disponibilidad</h4><dl class="especificaciones" style="border:0;margin-top:8px">' +
+      filaDatos("Sucursal", p.sucursal) + filaDatos("Unidades", p.stock) +
+      "</dl><p>El stock cambia durante el dia. Confirmamos disponibilidad al escribirte.</p></div>");
+  }
+  if (p.colores && p.colores.length) {
+    bloques.push('<div class="bloque"><h4>Colores</h4><p>' + p.colores.map(c => c.nombre).join(" &middot; ") + "</p></div>");
+  }
   const pie = '<a class="btn btn-azul" href="' + enlaceWA(p) + '" target="_blank" rel="noopener">Consultar este equipo</a>' +
     (p.modelo3d ? '<button class="btn btn-linea" data-ver3d="' + p.id + '">Ver en 3D</button>' : "");
   abrirModal({
-    etiqueta: cat ? cat.titulo : "",
+    etiqueta: p.marca || "",
     titulo: p.nombre,
-    sub: p.resumen || "",
-    cuerpo,
+    sub: p.resumen || (p.config || ""),
+    cuerpo: bloques.join(""),
     pie
   });
 }
@@ -1000,6 +1144,19 @@ function abrirVisor(producto) {
       return;
     }
     const controles = api.controles;
+    const cajaColor = $("#visorColores");
+    if (cajaColor && producto.colores && producto.colores.length && api.tieneColores()) {
+      cajaColor.hidden = false;
+      cajaColor.innerHTML = producto.colores.map((c, i) =>
+        '<button class="muestra' + (i === 0 ? " activo" : "") + '" data-hex="' + c.hex + '" style="background:' + c.hex + '" title="' + c.nombre + '" aria-label="Color ' + c.nombre + '"></button>'
+      ).join("");
+      cajaColor.addEventListener("click", ev => {
+        const b = ev.target.closest("[data-hex]");
+        if (!b) return;
+        $$(".muestra", cajaColor).forEach(x => x.classList.toggle("activo", x === b));
+        api.cambiarColor(b.dataset.hex);
+      });
+    }
     $("#btnGirar").addEventListener("click", ev => {
       const activo = !controles.autoRotate;
       controles.autoRotate = activo;
@@ -1081,6 +1238,8 @@ function crearVisor(m, lienzo, producto, estado, fallar) {
   }
 
   let piezas = [];
+  let tintables = [];
+  let colorActual = null;
 
   function medirPiezas() {
     piezas = [];
@@ -1090,6 +1249,26 @@ function crearVisor(m, lienzo, producto, estado, fallar) {
       if (!malla.geometry.boundingBox) malla.geometry.computeBoundingBox();
       const tam = malla.geometry.boundingBox.getSize(new T.Vector3());
       piezas.push({ malla, mayor: Math.max(tam.x, tam.y, tam.z) });
+    });
+  }
+
+  function prepararColores() {
+    if (!producto.tintables || !producto.tintables.length) return;
+    const nomes = new Set(producto.tintables);
+    tintables = [];
+    raiz.traverse(m => {
+      if (!m.isMesh || !m.material) return;
+      const mats = Array.isArray(m.material) ? m.material : [m.material];
+      mats.forEach(mt => { if (mt && mt.name && nomes.has(mt.name) && !mt.map) tintables.push(mt); });
+    });
+  }
+
+  function aplicarColor(hex) {
+    if (!tintables.length || !colorActual) return;
+    const c = new T.Color(colorActual);
+    tintables.forEach(mt => {
+      if (mt.color) mt.color.copy(c);
+      mt.needsUpdate = true;
     });
   }
 
@@ -1175,6 +1354,8 @@ function crearVisor(m, lienzo, producto, estado, fallar) {
       escena.add(raiz);
       raiz.updateMatrixWorld(true);
       ocultarFondo();
+      prepararColores();
+      if (colorActual) aplicarColor(colorActual);
       encuadrar();
       ocultarEstado();
     },
@@ -1198,6 +1379,8 @@ function crearVisor(m, lienzo, producto, estado, fallar) {
       controles.update();
     },
     reencuadrar() { controles.autoRotate = true; encuadrar(); },
+    cambiarColor(hex) { colorActual = hex; aplicarColor(hex); },
+    tieneColores() { return tintables.length > 0; },
     destruir() {
       animando = false;
       Limpios.forEach(fn => { try { fn(); } catch (e) {} });
@@ -1231,6 +1414,7 @@ function crearVisor(m, lienzo, producto, estado, fallar) {
 /* ---------------- arranque ---------------- */
 
 pintarCatalogo();
+pintarFiltros();
 revelar();
 marcarTira();
 flechasCarrusel();
@@ -1239,15 +1423,22 @@ sombraCabecera();
 portada();
 
 document.addEventListener("click", e => {
+  const filtro = e.target.closest("[data-marca]");
+  if (filtro) {
+    marcaActiva = filtro.dataset.marca;
+    $$("[data-marca]").forEach(b => b.classList.toggle("activo", b === filtro));
+    pintarCatalogo();
+    return;
+  }
   const ficha = e.target.closest("[data-ficha]");
   if (ficha) {
-    const p = PRODUCTOS.find(x => x.id === ficha.dataset.ficha);
+    const p = INVENTARIO.find(x => x.id === ficha.dataset.ficha) || EXCLUSIVOS.find(x => x.id === ficha.dataset.ficha);
     if (p) abrirFicha(p.id);
     return;
   }
   const ver3d = e.target.closest("[data-ver3d]");
   if (ver3d) {
-    const p = PRODUCTOS.find(x => x.id === ver3d.dataset.ver3d);
+    const p = INVENTARIO.find(x => x.id === ver3d.dataset.ver3d) || EXCLUSIVOS.find(x => x.id === ver3d.dataset.ver3d);
     if (!p) return;
     if (p.modelo3d) abrirVisor(p);
     else abrirFicha(p.id);

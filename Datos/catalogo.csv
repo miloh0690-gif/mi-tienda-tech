@@ -1,0 +1,209 @@
+id,nombre,marca,categoria,precio_usd_venta,sucursal,stock,config,pantalla,foto
+redmi-a7-64-4,REDMI A7 64/4,Xiaomi,celulares,94.0,NORTE,5,,,img/productos/redmi-a7-64-4.jpg
+redmi-a5,REDMI A5,Xiaomi,celulares,115.0,NORTE,5,,,img/productos/redmi-a5.jpg
+redmi-a5-128-4,REDMI A5 128/4,Xiaomi,celulares,125.0,NORTE,5,128 GB / 4 GB RAM,,img/productos/redmi-a5-128-4.jpg
+redmi-a7-pro-64-4,REDMI A7 PRO 64/4,Xiaomi,celulares,95.0,NORTE,5,,,img/productos/redmi-a7-pro-64-4.jpg
+redmi-a7-pro-128-4,REDMI A7 PRO 128/4,Xiaomi,celulares,112.0,NORTE,5,128 GB / 4 GB RAM,,img/productos/redmi-a7-pro-128-4.jpg
+redmi-15c-128-4,REDMI 15C 128/4,Xiaomi,celulares,127.0,NORTE,5,128 GB / 4 GB RAM,,img/productos/redmi-15c-128-4.jpg
+redmi-15c-256-4,REDMI 15C 256/4,Xiaomi,celulares,138.0,NORTE,5,256 GB / 4 GB RAM,,img/productos/redmi-15c-256-4.jpg
+redmi-15c-256-8,REDMI 15C 256/8,Xiaomi,celulares,156.0,NORTE,5,256 GB / 8 GB RAM,,img/productos/redmi-15c-256-8.jpg
+redmi-15-256-8,REDMI 15 256/8,Xiaomi,celulares,185.0,NORTE,5,256 GB / 8 GB RAM,,img/productos/redmi-15-256-8.jpg
+redmi-17-128-4,REDMI 17 128/4,Xiaomi,celulares,157.0,NORTE,5,128 GB / 4 GB RAM,,img/productos/redmi-17-128-4.jpg
+redmi-17-256-4,REDMI 17 256/4,Xiaomi,celulares,180.0,NORTE,5,256 GB / 4 GB RAM,,img/productos/redmi-17-256-4.jpg
+redmi-note-14-pro-5g-256-8,REDMI NOTE 14 PRO 5G 256/8,Xiaomi,celulares,257.0,NORTE,5,256 GB / 8 GB RAM,,img/productos/redmi-note-14-pro-5g-256-8.jpg
+redmi-note-15-128-6,REDMI NOTE 15 128/6,Xiaomi,celulares,173.0,NORTE,5,128 GB / 6 GB RAM,,img/productos/redmi-note-15-128-6.jpg
+redmi-note-15-256-8,REDMI NOTE 15 256/8,Xiaomi,celulares,195.0,NORTE,5,256 GB / 8 GB RAM,,img/productos/redmi-note-15-256-8.jpg
+redmi-note-15-pro-4g,REDMI NOTE 15 PRO 4G,Xiaomi,celulares,243.0,NORTE,5,,,img/productos/redmi-note-15-pro-4g.jpg
+redmi-note-15-pro-5g-256-8,REDMI NOTE 15 PRO 5G 256/8,Xiaomi,celulares,293.0,NORTE,5,256 GB / 8 GB RAM,,img/productos/redmi-note-15-pro-5g-256-8.jpg
+redmi-note-15-pro-5g-512-8,REDMI NOTE 15 PRO 5G 512/8,Xiaomi,celulares,310.0,NORTE,5,512 GB / 8 GB RAM,,img/productos/redmi-note-15-pro-5g-512-8.jpg
+redmi-note-15-pro-plus-5g-256-8,REDMI NOTE 15 PRO + 5G 256/8,Xiaomi,celulares,335.0,NORTE,5,256 GB / 8 GB RAM,,img/productos/redmi-note-15-pro-plus-5g-256-8.jpg
+redmi-note-15-pro-plus-5g-512-12,REDMI NOTE 15 PRO + 5G 512/12,Xiaomi,celulares,398.0,NORTE,5,512 GB / 12 GB RAM,,img/productos/redmi-note-15-pro-plus-5g-512-12.jpg
+redmi-pad-2-256-8,REDMI PAD 2 256/8,Xiaomi,tablets,210.0,NORTE,5,256 GB / 8 GB RAM,,img/productos/redmi-pad-2-256-8.jpg
+pad-7-pro-256-8,PAD 7 PRO 256/8,Xiaomi,tablets,445.0,NORTE,5,256 GB / 8 GB RAM,,img/productos/pad-7-pro-256-8.jpg
+pad-8-256-8,PAD 8 256/8,Xiaomi,tablets,425.0,NORTE,5,256 GB / 8 GB RAM,,img/productos/pad-8-256-8.jpg
+pad-8-pro-256-8,PAD 8 PRO 256/8,Xiaomi,tablets,535.0,NORTE,5,256 GB / 8 GB RAM,,img/productos/pad-8-pro-256-8.jpg
+pad-2-pro-256-8,PAD 2 PRO 256/8,Xiaomi,tablets,340.0,NORTE,5,256 GB / 8 GB RAM,,img/productos/pad-2-pro-256-8.jpg
+xiaomi-17t-512-8,XIAOMI 17T 512/8,Xiaomi,celulares,565.0,NORTE,5,512 GB / 8 GB RAM,,img/productos/xiaomi-17t-512-8.jpg
+xiaomi-17t-pro-512-8,XIAOMI 17T PRO 512/8,Xiaomi,celulares,725.0,NORTE,5,512 GB / 8 GB RAM,,img/productos/xiaomi-17t-pro-512-8.jpg
+xiaomi-17,XIAOMI 17,Xiaomi,celulares,795.0,NORTE,5,,,img/productos/xiaomi-17.jpg
+xiaomi-17t-pro-12-512,XIAOMI 17T PRO 12/512,Xiaomi,celulares,695.0,NORTE,5,512 GB,,img/productos/xiaomi-17t-pro-12-512.jpg
+xiaomi-17t-pro-12-1t,XIAOMI 17T PRO 12/1T,Xiaomi,celulares,785.0,NORTE,5,1 TB,,img/productos/xiaomi-17t-pro-12-1t.jpg
+xiaomi-17-ultra,XIAOMI 17 ULTRA,Xiaomi,celulares,1140.0,NORTE,5,,,img/productos/xiaomi-17-ultra.jpg
+samsung-a06-64-4,SAMSUNG A06 64/4,Samsung,celulares,105.0,MALL,5,,,img/productos/samsung-a06-64-4.jpg
+samsung-a07-64-4,SAMSUNG A07 64/4,Samsung,celulares,135.0,MALL,5,,,img/productos/samsung-a07-64-4.jpg
+samsung-a07-128-4,SAMSUNG A07 128/4,Samsung,celulares,155.0,MALL,4,128 GB / 4 GB RAM,,img/productos/samsung-a07-128-4.jpg
+samsung-a07-128-6,SAMSUNG A07 128/6,Samsung,celulares,165.0,MALL,2,128 GB / 6 GB RAM,,img/productos/samsung-a07-128-6.jpg
+samsung-a16-128-4,SAMSUNG A16 128/4,Samsung,celulares,147.0,MALL,5,128 GB / 4 GB RAM,,img/productos/samsung-a16-128-4.jpg
+samsung-a17-128-6,SAMSUNG A17 128/6,Samsung,celulares,195.0,MALL,5,128 GB / 6 GB RAM,,img/productos/samsung-a17-128-6.jpg
+samsung-a17-256-8,SAMSUNG A17 256/8,Samsung,celulares,255.0,MALL,5,256 GB / 8 GB RAM,,img/productos/samsung-a17-256-8.jpg
+samsung-a26-256-8,SAMSUNG A26 256/8,Samsung,celulares,275.0,MALL,5,256 GB / 8 GB RAM,,img/productos/samsung-a26-256-8.jpg
+samsung-a27-256-8,SAMSUNG A27 256/8,Samsung,celulares,358.0,MALL,5,256 GB / 8 GB RAM,,img/productos/samsung-a27-256-8.jpg
+samsung-a37-256-8,SAMSUNG A37 256/8,Samsung,celulares,415.0,MALL,5,256 GB / 8 GB RAM,,img/productos/samsung-a37-256-8.jpg
+samsung-a56-256-8,SAMSUNG A56 256/8,Samsung,celulares,400.0,MALL,5,256 GB / 8 GB RAM,,img/productos/samsung-a56-256-8.jpg
+samsung-a57-256-8,SAMSUNG A57 256/8,Samsung,celulares,465.0,MALL,5,256 GB / 8 GB RAM,,img/productos/samsung-a57-256-8.jpg
+samsung-s25-fe-256-8,SAMSUNG S25 FE 256/8,Samsung,celulares,665.0,MALL,5,256 GB / 8 GB RAM,,img/productos/samsung-s25-fe-256-8.jpg
+samsung-s25-ultra-25612,SAMSUNG S25 ULTRA 25612,Samsung,celulares,1060.0,MALL,5,256 GB / 12 GB RAM,,img/productos/samsung-s25-ultra-25612.jpg
+samsung-s25-ultra-512-12,SAMSUNG S25 ULTRA 512/12,Samsung,celulares,1160.0,MALL,5,512 GB / 12 GB RAM,,img/productos/samsung-s25-ultra-512-12.jpg
+samsung-s26-256-12,SAMSUNG S26 256/12,Samsung,celulares,815.0,MALL,5,256 GB / 12 GB RAM,,img/productos/samsung-s26-256-12.jpg
+samsung-s26plus-256-12,SAMSUNG S26+ 256/12,Samsung,celulares,1015.0,MALL,5,256 GB / 12 GB RAM,,img/productos/samsung-s26plus-256-12.jpg
+samsung-s26-ultra-256-12,SAMSUNG S26 ULTRA 256/12,Samsung,celulares,1185.0,MALL,5,256 GB / 12 GB RAM,,img/productos/samsung-s26-ultra-256-12.jpg
+samsung-s26-ultra-512-12,SAMSUNG S26 ULTRA 512/12,Samsung,celulares,1355.0,MALL,4,512 GB / 12 GB RAM,,img/productos/samsung-s26-ultra-512-12.jpg
+samsung-zflip-5-256-8,SAMSUNG ZFLIP 5 256/8,Samsung,celulares,505.0,MALL,5,256 GB / 8 GB RAM,,img/productos/samsung-zflip-5-256-8.jpg
+samsung-zflip-7-256-12,SAMSUNG ZFLIP 7 256/12,Samsung,celulares,975.0,MALL,5,256 GB / 12 GB RAM,,img/productos/samsung-zflip-7-256-12.jpg
+samsung-zfold-5-256-12,SAMSUNG ZFOLD 5 256/12,Samsung,celulares,1255.0,MALL,5,256 GB / 12 GB RAM,,img/productos/samsung-zfold-5-256-12.jpg
+samsung-zfold-5-512-12,SAMSUNG ZFOLD 5 512/12,Samsung,celulares,1405.0,MALL,5,512 GB / 12 GB RAM,,img/productos/samsung-zfold-5-512-12.jpg
+samsung-zfold-7-512-12,SAMSUNG ZFOLD 7 512/12,Samsung,celulares,1765.0,MALL,5,512 GB / 12 GB RAM,,img/productos/samsung-zfold-7-512-12.jpg
+samsung-zflip-8-256-12,SAMSUNG ZFLIP 8 256/12,Samsung,celulares,1195.0,MALL,5,256 GB / 12 GB RAM,,img/productos/samsung-zflip-8-256-12.jpg
+samsung-zflip-8-512-12,SAMSUNG ZFLIP 8 512/12,Samsung,celulares,1345.0,MALL,5,512 GB / 12 GB RAM,,img/productos/samsung-zflip-8-512-12.jpg
+samsung-zfold-8-512-12,SAMSUNG ZFOLD 8 512/12,Samsung,celulares,1965.0,MALL,5,512 GB / 12 GB RAM,,img/productos/samsung-zfold-8-512-12.jpg
+samsung-zfold-8-ultra-256-12,SAMSUNG ZFOLD 8 ULTRA 256/12,Samsung,celulares,2085.0,MALL,5,256 GB / 12 GB RAM,,img/productos/samsung-zfold-8-ultra-256-12.jpg
+samsung-zfold-8-ultra-512-12,SAMSUNG ZFOLD 8 ULTRA 512/12,Samsung,celulares,2245.0,MALL,5,512 GB / 12 GB RAM,,img/productos/samsung-zfold-8-ultra-512-12.jpg
+tab-a9plus-5g-11-64-4,TAB A9+ 5G 11 64/4,Samsung,tablets,240.0,MALL,5,,,img/productos/tab-a9plus-5g-11-64-4.jpg
+tab-a11-8-7-wifi-64-4,TAB A11 8.7 WIFI 64/4,Samsung,tablets,170.0,MALL,5,,,img/productos/tab-a11-8-7-wifi-64-4.jpg
+tab-a11-8-7-chip-128-8,Tab A11 8.7 CHIP 128/8,Samsung,tablets,215.0,MALL,5,128 GB / 8 GB RAM,,img/productos/tab-a11-8-7-chip-128-8.jpg
+tab-a11-plus-5g-11-chip-128-6,Tab A11 + 5g 11 CHIP 128/6,Samsung,tablets,265.0,MALL,5,128 GB / 6 GB RAM,11,img/productos/tab-a11-plus-5g-11-chip-128-6.jpg
+tab-s6-lite-10-4-64-4,Tab S6 lite 10.4 64/4,Samsung,tablets,385.0,MALL,5,,,img/productos/tab-s6-lite-10-4-64-4.jpg
+tab-s10-lite-5g-11-128-6,Tab S10 Lite 5g 11 128/6,Samsung,tablets,485.0,MALL,5,128 GB / 6 GB RAM,,img/productos/tab-s10-lite-5g-11-128-6.jpg
+tab-s10-fe-11-wifi-128-8,Tab S10 FE 11 WIFI 128/8,Samsung,tablets,625.0,MALL,5,128 GB / 8 GB RAM,11,img/productos/tab-s10-fe-11-wifi-128-8.jpg
+tab-s10-feplus-13-wifi-128-8,Tab S10 FE+ 13 WIFI 128/8,Samsung,tablets,795.0,MALL,5,128 GB / 8 GB RAM,13,img/productos/tab-s10-feplus-13-wifi-128-8.jpg
+tab-s8-ultra-wifi,Tab S8 Ultra WIFI,Samsung,tablets,905.0,MALL,5,,,img/productos/tab-s8-ultra-wifi.jpg
+tab-s9-5g-256-12,Tab S9 5G 256/12,Samsung,tablets,650.0,MALL,5,256 GB / 12 GB RAM,,img/productos/tab-s9-5g-256-12.jpg
+tab-s10plus-12-4-wifi-256-12,Tab S10+ 12.4 WIFI 256/12,Samsung,tablets,950.0,MALL,5,256 GB / 12 GB RAM,12.4,img/productos/tab-s10plus-12-4-wifi-256-12.jpg
+tab-s10-ultra-14-6-wifi-256-12,Tab S10 Ultra 14.6 WIFI 256/12,Samsung,tablets,1185.0,MALL,5,256 GB / 12 GB RAM,14.6,img/productos/tab-s10-ultra-14-6-wifi-256-12.jpg
+tab-s11-11-wifi-256-12,Tab S11 11 WIFI 256/12,Samsung,tablets,1035.0,MALL,5,256 GB / 12 GB RAM,11,img/productos/tab-s11-11-wifi-256-12.jpg
+tab-s11-ultra-14-6-wifi-256-12,Tab S11 ultra 14.6 WIFI 256/12,Samsung,tablets,1405.0,MALL,5,256 GB / 12 GB RAM,14.6,img/productos/tab-s11-ultra-14-6-wifi-256-12.jpg
+motorola-g06-64-4,MOTOROLA G06 64/4,Motorola,celulares,105.0,CENTRAL,4,,,img/productos/motorola-g06-64-4.jpg
+motorola-g15-128-4,MOTOROLA G15 128/4,Motorola,celulares,133.0,CENTRAL,4,128 GB / 4 GB RAM,,img/productos/motorola-g15-128-4.jpg
+motorola-g15-256-4,MOTOROLA G15 256/4,Motorola,celulares,145.0,CENTRAL,5,256 GB / 4 GB RAM,,img/productos/motorola-g15-256-4.jpg
+motorola-g15-512-4,MOTOROLA G15 512/4,Motorola,celulares,160.0,CENTRAL,5,512 GB / 4 GB RAM,,img/productos/motorola-g15-512-4.jpg
+motorola-g17-256-4,MOTOROLA G17 256/4,Motorola,celulares,165.0,CENTRAL,4,256 GB / 4 GB RAM,,img/productos/motorola-g17-256-4.jpg
+motorola-g35-5g-256-4,MOTOROLA G35 5G 256/4,Motorola,celulares,148.0,CENTRAL,4,256 GB / 4 GB RAM,,img/productos/motorola-g35-5g-256-4.jpg
+motorola-g56-5g-256-8,MOTOROLA G56 5G 256/8,Motorola,celulares,220.0,CENTRAL,4,256 GB / 8 GB RAM,,img/productos/motorola-g56-5g-256-8.jpg
+motorola-g75-5g-256-4,MOTOROLA G75 5G 256/4,Motorola,celulares,210.0,CENTRAL,5,256 GB / 4 GB RAM,,img/productos/motorola-g75-5g-256-4.jpg
+motorola-g17-power,MOTOROLA G17 POWER,Motorola,celulares,,CENTRAL,5,,,img/productos/motorola-g17-power.jpg
+motorola-g86-power,MOTOROLA G86 POWER,Motorola,celulares,265.0,CENTRAL,5,,,img/productos/motorola-g86-power.jpg
+motorola-g67-5g-power-256-8,MOTOROLA G67 5G POWER 256/8,Motorola,celulares,225.0,CENTRAL,5,256 GB / 8 GB RAM,,img/productos/motorola-g67-5g-power-256-8.jpg
+moto-60-fusion-5g-256-8,MOTO 60 FUSION 5G 256/8,Motorola,celulares,275.0,CENTRAL,5,256 GB / 8 GB RAM,,img/productos/moto-60-fusion-5g-256-8.jpg
+moto-70-fusion-5g-256-8,MOTO 70 FUSION 5G 256/8,Motorola,celulares,400.0,CENTRAL,5,256 GB / 8 GB RAM,,img/productos/moto-70-fusion-5g-256-8.jpg
+moto-razr-60-512-12,MOTO RAZR 60 512/12,Motorola,celulares,655.0,CENTRAL,5,512 GB / 12 GB RAM,,img/productos/moto-razr-60-512-12.jpg
+moto-50-razr-ultra-512-12,MOTO 50 RAZR ULTRA 512/12,Motorola,celulares,905.0,CENTRAL,5,512 GB / 12 GB RAM,,img/productos/moto-50-razr-ultra-512-12.jpg
+moto-50-razr-ultra-caja-grande-512-8-12,MOTO 50 RAZR ULTRA CAJA GRANDE 512/8/12,Motorola,celulares,925.0,CENTRAL,5,512 GB / 8 GB RAM,,img/productos/moto-50-razr-ultra-caja-grande-512-8-12.jpg
+moto-60-razr-1t-12,MOTO 60 RAZR 1T/12,Motorola,celulares,985.0,CENTRAL,5,1 TB,,img/productos/moto-60-razr-1t-12.jpg
+motorola-signature-1t-16,MOTOROLA SIGNATURE 1T/16,Motorola,celulares,1025.0,CENTRAL,5,1 TB,,img/productos/motorola-signature-1t-16.jpg
+redmi-14c,Redmi 14C,Xiaomi,celulares,130.0,CENTRAL,5,,,img/productos/redmi-14c.jpg
+tecno-spark-go3-64,TECNO SPARK GO3 64,Tecno,celulares,96.0,NORTE,5,,,img/productos/tecno-spark-go3-64.jpg
+tecno-spark-go3-128,TECNO SPARK GO3 128,Tecno,celulares,106.0,NORTE,5,128 GB,,img/productos/tecno-spark-go3-128.jpg
+tecno-spark-50-256,TECNO SPARK 50 256,Tecno,celulares,149.0,NORTE,4,256 GB,,img/productos/tecno-spark-50-256.jpg
+tecno-sparck-50-5g-256-6,TECNO SPARCK 50 5G 256/6,Tecno,celulares,240.0,NORTE,5,256 GB / 6 GB RAM,50,img/productos/tecno-sparck-50-5g-256-6.jpg
+tecno-sparck-50-pro-256-8,TECNO SPARCK 50 PRO 256/8,Tecno,celulares,285.0,NORTE,5,256 GB / 8 GB RAM,,img/productos/tecno-sparck-50-pro-256-8.jpg
+tecno-pova-8-pro-5g-256-8,TECNO POVA 8 PRO 5G 256/8,Tecno,celulares,343.0,NORTE,5,256 GB / 8 GB RAM,,img/productos/tecno-pova-8-pro-5g-256-8.jpg
+tecno-pova-8-5g-256-8,TECNO POVA 8 5G 256/8,Tecno,celulares,300.0,NORTE,5,256 GB / 8 GB RAM,,img/productos/tecno-pova-8-5g-256-8.jpg
+tecno-pova-8-pro-lamborgini,TECNO POVA 8 PRO LAMBORGINI,Tecno,celulares,355.0,NORTE,5,,,img/productos/tecno-pova-8-pro-lamborgini.jpg
+tecno-camon-50-pro,TECNO CAMON 50 PRO,Tecno,celulares,300.0,NORTE,5,,,img/productos/tecno-camon-50-pro.jpg
+pova-curve-2,POVA CURVE 2,Tecno,celulares,288.0,NORTE,5,,,img/productos/pova-curve-2.jpg
+meizu-note-21,MEIZU NOTE 21,Meizu,celulares,117.0,NORTE,5,,,img/productos/meizu-note-21.jpg
+infinix-smart-20-64,INFINIX SMART 20 64,Infinix,celulares,100.0,NORTE,5,,,img/productos/infinix-smart-20-64.jpg
+infinix-smart-20-128,INFINIX SMART 20 128,Infinix,celulares,108.0,NORTE,5,128 GB,,img/productos/infinix-smart-20-128.jpg
+infinix-hot-70-128-4,INFINIX HOT 70 128/4,Infinix,celulares,136.0,NORTE,4,128 GB / 4 GB RAM,,img/productos/infinix-hot-70-128-4.jpg
+infinix-hot-70-256-4,INFINIX HOT 70 256/4,Infinix,celulares,151.0,NORTE,5,256 GB / 4 GB RAM,,img/productos/infinix-hot-70-256-4.jpg
+infinix-hot-60-pro-256,INFINIX HOT 60 PRO 256,Infinix,celulares,187.0,NORTE,5,256 GB,,img/productos/infinix-hot-60-pro-256.jpg
+infinix-hot-60-pro-plus-256,INFINIX HOT 60 PRO PLUS 256,Infinix,celulares,211.0,NORTE,4,256 GB,,img/productos/infinix-hot-60-pro-plus-256.jpg
+infinix-note-60-256-8,INFINIX NOTE 60 256/8,Infinix,celulares,247.0,NORTE,5,256 GB / 8 GB RAM,,img/productos/infinix-note-60-256-8.jpg
+infinix-note-60-pro-256,INFINIX NOTE 60 PRO 256,Infinix,celulares,330.0,NORTE,5,256 GB,,img/productos/infinix-note-60-pro-256.jpg
+infinix-gt-30-256-8,INFINIX GT 30 256/8,Infinix,celulares,222.0,NORTE,5,256 GB / 8 GB RAM,,img/productos/infinix-gt-30-256-8.jpg
+infinix-gt50-256-12,INFINIX GT50 256/12,Infinix,celulares,490.0,NORTE,5,256 GB / 12 GB RAM,,img/productos/infinix-gt50-256-12.jpg
+zte-a35e-64-2,ZTE A35E 64/2,ZTE,celulares,80.0,NORTE,5,,,img/productos/zte-a35e-64-2.jpg
+zte-a36-64-2,ZTE A36 64/2,ZTE,celulares,86.0,NORTE,5,,,img/productos/zte-a36-64-2.jpg
+zte-a56-128-4,ZTE A56 128/4,ZTE,celulares,99.0,NORTE,5,128 GB / 4 GB RAM,,img/productos/zte-a56-128-4.jpg
+zte-a36-64-4,ZTE A36 64/4,ZTE,celulares,91.0,NORTE,5,,,img/productos/zte-a36-64-4.jpg
+zte-a56-pro-128,ZTE A56 PRO 128,ZTE,celulares,109.0,NORTE,5,128 GB,,img/productos/zte-a56-pro-128.jpg
+zte-v80-max-256-4,ZTE V80 MAX 256/4,ZTE,celulares,125.0,NORTE,5,256 GB / 4 GB RAM,,img/productos/zte-v80-max-256-4.jpg
+zte-v80-pro-256-8,ZTE V80 PRO 256/8,ZTE,celulares,185.0,NORTE,5,256 GB / 8 GB RAM,,img/productos/zte-v80-pro-256-8.jpg
+zte-neo-5-256-8,ZTE NEO 5 256/8,ZTE,celulares,257.0,NORTE,5,256 GB / 8 GB RAM,,img/productos/zte-neo-5-256-8.jpg
+zte-gt-neo-5-256-8,ZTE GT NEO 5 256/8,ZTE,celulares,390.0,NORTE,5,256 GB / 8 GB RAM,,img/productos/zte-gt-neo-5-256-8.jpg
+honor-x8d,HONOR X8D,Honor,celulares,245.0,NORTE,4,,,img/productos/honor-x8d.jpg
+honor-x7d-256-6,HONOR X7D 256/6,Honor,celulares,192.0,NORTE,5,256 GB / 6 GB RAM,,img/productos/honor-x7d-256-6.jpg
+honor-play-10-64,HONOR PLAY 10 64,Honor,celulares,95.0,NORTE,5,,,img/productos/honor-play-10-64.jpg
+honor-play-10-128,HONOR PLAY 10 128,Honor,celulares,117.0,NORTE,5,128 GB,,img/productos/honor-play-10-128.jpg
+honor-600-pro-512,HONOR 600 PRO 512,Honor,celulares,865.0,NORTE,5,,,img/productos/honor-600-pro-512.jpg
+honor-600-512,HONOR 600 512,Honor,celulares,665.0,MALL,5,,,img/productos/honor-600-512.jpg
+honor-600-256,HONOR 600 256,Honor,celulares,605.0,MALL,5,,,img/productos/honor-600-256.jpg
+honor-600e-512,HONOR 600e 512,Honor,celulares,483.0,MALL,5,512 GB,,img/productos/honor-600e-512.jpg
+honor-600e-256,HONOR 600e 256,Honor,celulares,434.0,MALL,5,256 GB,,img/productos/honor-600e-256.jpg
+honor-magic-8-lite-512,HONOR MAGIC 8 LITE 512,Honor,celulares,412.0,MALL,5,512 GB,,img/productos/honor-magic-8-lite-512.jpg
+honor-magic-8-lite-256,HONOR MAGIC 8 LITE 256,Honor,celulares,345.0,MALL,5,256 GB,,img/productos/honor-magic-8-lite-256.jpg
+honor-magic-8-pro,HONOR MAGIC 8 PRO,Honor,celulares,1230.0,MALL,5,,,img/productos/honor-magic-8-pro.jpg
+honor-x5c,HONOR X5C,Honor,celulares,113.0,MALL,5,,,img/productos/honor-x5c.jpg
+honor-x7e,HONOR X7e,Honor,celulares,223.0,MALL,5,,,img/productos/honor-x7e.jpg
+honor-x6e-256,HONOR X6e 256,Honor,celulares,185.0,MALL,5,256 GB,,img/productos/honor-x6e-256.jpg
+honor-x5d-256-4,HONOR X5D 256/4,Honor,celulares,147.0,MALL,5,256 GB / 4 GB RAM,,img/productos/honor-x5d-256-4.jpg
+honor-x5d-128,HONOR X5D 128,Honor,celulares,135.0,MALL,5,128 GB,,img/productos/honor-x5d-128.jpg
+honor-x5d-64,HONOR X5D 64,Honor,celulares,125.0,MALL,5,,,img/productos/honor-x5d-64.jpg
+honor-x7e-256-6,HONOR X7e 256/6,Honor,celulares,220.0,MALL,5,256 GB / 6 GB RAM,,img/productos/honor-x7e-256-6.jpg
+honor-x6e-128-4,HONOR X6e 128/4,Honor,celulares,158.0,MALL,5,128 GB / 4 GB RAM,,img/productos/honor-x6e-128-4.jpg
+honor-x6e-256-4,HONOR X6e 256/4,Honor,celulares,179.0,MALL,5,256 GB / 4 GB RAM,,img/productos/honor-x6e-256-4.jpg
+honor-x5-plus-256-6,HONOR X5 PLUS 256/6,Honor,celulares,149.0,MALL,5,256 GB / 6 GB RAM,,img/productos/honor-x5-plus-256-6.jpg
+honor-pad-10256-8,HONOR PAD 10256/8,Honor,tablets,505.0,MALL,5,256 GB / 8 GB RAM,,img/productos/honor-pad-10256-8.jpg
+honor-pad-x8b-128-4,HONOR PAD X8b 128/4,Honor,tablets,268.0,MALL,5,128 GB / 4 GB RAM,,img/productos/honor-pad-x8b-128-4.jpg
+honor-pad-x7,HONOR PAD X7,Honor,tablets,160.0,MALL,5,,,img/productos/honor-pad-x7.jpg
+honor-pad-x8a,HONOR PAD X8a,Honor,tablets,235.0,MALL,5,,,img/productos/honor-pad-x8a.jpg
+honor-pad-x9a,HONOR PAD x9a,Honor,tablets,415.0,MALL,5,,,img/productos/honor-pad-x9a.jpg
+honor-pad-x9a-2,HONOR PAD X9a,Honor,tablets,455.0,MALL,5,,,img/productos/honor-pad-x9a-2.jpg
+realme-note-70-256-8,REALME NOTE 70 256/8,Realme,celulares,150.0,SUR,1,256 GB / 8 GB RAM,,img/productos/realme-note-70-256-8.jpg
+realme-note-70-128-4,REALME NOTE 70 128/4,Realme,celulares,112.0,SUR,5,128 GB / 4 GB RAM,,img/productos/realme-note-70-128-4.jpg
+realme-c71-256-8,REALME C71 256/8,Realme,celulares,160.0,SUR,5,256 GB / 8 GB RAM,,img/productos/realme-c71-256-8.jpg
+realme-c85-256-8,REALME C85 256/8,Realme,celulares,215.0,SUR,5,256 GB / 8 GB RAM,,img/productos/realme-c85-256-8.jpg
+realme-13-5g-256-12,REALME 13 5G 256/12,Realme,celulares,225.0,SUR,5,256 GB / 12 GB RAM,13,img/productos/realme-13-5g-256-12.jpg
+realme-14t-256-8,REALME 14T 256/8,Realme,celulares,220.0,SUR,5,256 GB / 8 GB RAM,,img/productos/realme-14t-256-8.jpg
+realme-14-5g-256-8,REALME 14 5G 256/8,Realme,celulares,250.0,SUR,5,256 GB / 8 GB RAM,14,img/productos/realme-14-5g-256-8.jpg
+realme-16-pro-512-12,REALME 16 PRO 512/12,Realme,celulares,396.0,SUR,5,512 GB / 12 GB RAM,,img/productos/realme-16-pro-512-12.jpg
+realme-16-pro-plus,REALME 16 PRO PLUS,Realme,celulares,545.0,SUR,5,,,img/productos/realme-16-pro-plus.jpg
+realme-16-5g,REALME 16 5G,Realme,celulares,318.0,SUR,5,,16,img/productos/realme-16-5g.jpg
+realme-p4-power-512-12,REALME P4 POWER 512/12,Realme,celulares,467.0,SUR,5,512 GB / 12 GB RAM,,img/productos/realme-p4-power-512-12.jpg
+ipad-air-11-m4-256,IPAD AIR 11 M4 256,Apple,tablets,895.0,ESTE,5,256 GB,,img/productos/ipad-air-11-m4-256.jpg
+ipad-air-13-m4-256,IPAD AIR 13 M4 256,Apple,tablets,1090.0,ESTE,5,256 GB,,img/productos/ipad-air-13-m4-256.jpg
+ipad-pro-11-m5-256,IPAD PRO 11 M5 256,Apple,tablets,1225.0,ESTE,5,256 GB,,img/productos/ipad-pro-11-m5-256.jpg
+macbook-air-13-m5-512-16,MACBOOK AIR 13 M5 512/16,Apple,laptops,1325.0,ESTE,5,512 GB / 16 GB RAM,,img/productos/macbook-air-13-m5-512-16.jpg
+iphone-17-pro-256-chip,IPHONE 17 PRO 256 CHIP,Apple,celulares,1240.0,ESTE,5,256 GB,,img/productos/iphone-17-pro-256-chip.jpg
+iphone-17-pro-max-256-chip-azul,IPHONE 17 PRO MAX 256 CHIP AZUL,Apple,celulares,1340.0,ESTE,5,256 GB,,img/productos/iphone-17-pro-max-256-chip-azul.jpg
+iphone-17-pro-max-256-chip-blanco,IPHONE 17 PRO MAX 256 CHIP BLANCO,Apple,celulares,1350.0,ESTE,5,256 GB,,img/productos/iphone-17-pro-max-256-chip-blanco.jpg
+iphone-17-pro-max-512-chip-blanco,IPHONE 17 PRO MAX 512 CHIP BLANCO,Apple,celulares,1570.0,ESTE,5,512 GB,,img/productos/iphone-17-pro-max-512-chip-blanco.jpg
+iphone-17-256-esim-jp,IPHONE 17 256 Esim JP,Apple,celulares,877.0,ESTE,5,256 GB,,img/productos/iphone-17-256-esim-jp.jpg
+iphone-17-256-esim-jp-lila,IPHONE 17 256 Esim JP lila,Apple,celulares,880.0,ESTE,5,256 GB,,img/productos/iphone-17-256-esim-jp-lila.jpg
+iphone-17-pro-esim,IPHONE 17 PRO Esim,Apple,celulares,1145.0,ESTE,5,,,img/productos/iphone-17-pro-esim.jpg
+iphone-17-pro-esim-blanco,IPHONE 17 PRO Esim Blanco,Apple,celulares,1155.0,ESTE,5,,,img/productos/iphone-17-pro-esim-blanco.jpg
+iphone-17-pro-max-esim-256,IPHONE 17 PRO MAX Esim 256,Apple,celulares,1245.0,ESTE,5,256 GB,,img/productos/iphone-17-pro-max-esim-256.jpg
+iphone-17-pro-max-esim-256-blanco,IPHONE 17 PRO MAX Esim 256 blanco,Apple,celulares,1245.0,ESTE,5,256 GB,,img/productos/iphone-17-pro-max-esim-256-blanco.jpg
+iphone-17-pro-max-512-esim-jp,IPHONE 17 PRO MAX 512 Esim JP,Apple,celulares,1430.0,ESTE,5,512 GB,,img/productos/iphone-17-pro-max-512-esim-jp.jpg
+iphone-17-pro-max-esim-256-2,IPHONE 17 PRO MAX Esim 256,Apple,celulares,1435.0,ESTE,5,256 GB,,img/productos/iphone-17-pro-max-esim-256-2.jpg
+iphone-17-pro-max-esim-1t,IPHONE 17 PRO MAX Esim 1T,Apple,celulares,1655.0,ESTE,5,1 TB,,img/productos/iphone-17-pro-max-esim-1t.jpg
+iphone-14-pro-max-256-chip-caja-blanca,IPHONE 14 PRO MAX 256 CHIP CAJA BLANCA,Apple,celulares,845.0,ESTE,5,256 GB,,img/productos/iphone-14-pro-max-256-chip-caja-blanca.jpg
+iphone-15-pro-max-256-chip-caja-blanca,IPHONE 15 PRO MAX 256 CHIP caja blanca,Apple,celulares,945.0,ESTE,5,256 GB,,img/productos/iphone-15-pro-max-256-chip-caja-blanca.jpg
+iphone-16-pro-max-256-esim-caja-blanca,IPHONE 16 PRO MAX 256 Esim caja blanca,Apple,celulares,1040.0,ESTE,5,256 GB,,img/productos/iphone-16-pro-max-256-esim-caja-blanca.jpg
+poco-x8-pro-max-512-12,POCO X8 PRO MAX 512/12,Xiaomi,celulares,503.0,SUR,5,512 GB / 12 GB RAM,,img/productos/poco-x8-pro-max-512-12.jpg
+poco-x8-pro-256-8,POCO X8 PRO 256/8,Xiaomi,celulares,343.0,SUR,5,256 GB / 8 GB RAM,,img/productos/poco-x8-pro-256-8.jpg
+poco-x8-pro-512-12,POCO X8 PRO 512/12,Xiaomi,celulares,403.0,SUR,5,512 GB / 12 GB RAM,,img/productos/poco-x8-pro-512-12.jpg
+poco-x7-pro-512-12,POCO X7 PRO 512/12,Xiaomi,celulares,333.0,SUR,5,512 GB / 12 GB RAM,,img/productos/poco-x7-pro-512-12.jpg
+poco-m8-pro-512-12,POCO M8 PRO 512/12,Xiaomi,celulares,310.0,SUR,5,512 GB / 12 GB RAM,,img/productos/poco-m8-pro-512-12.jpg
+poco-c85-256-8,POCO C85 256/8,Xiaomi,celulares,157.0,SUR,5,256 GB / 8 GB RAM,,img/productos/poco-c85-256-8.jpg
+poco-c81-pro-128-4,POCO C81 PRO 128/4,Xiaomi,celulares,120.0,SUR,5,128 GB / 4 GB RAM,,img/productos/poco-c81-pro-128-4.jpg
+poco-c71-128-4,POCO C71 128/4,Xiaomi,celulares,120.0,SUR,5,128 GB / 4 GB RAM,,img/productos/poco-c71-128-4.jpg
+poco-c81-pro-64-4,POCO C81 PRO 64/4,Xiaomi,celulares,105.0,SUR,5,,,img/productos/poco-c81-pro-64-4.jpg
+cubot-mini-4-128-6,CUBOT MINI 4 128/6,Cubot,celulares,155.0,NORTE,5,128 GB / 6 GB RAM,,img/productos/cubot-mini-4-128-6.jpg
+cubot-kinkong-3-256-6,CUBOT KINKONG 3 256/6,Cubot,celulares,165.0,NORTE,5,256 GB / 6 GB RAM,,img/productos/cubot-kinkong-3-256-6.jpg
+cubot-p90-256-16,CUBOT P90 256/16,Cubot,celulares,185.0,NORTE,5,256 GB / 16 GB RAM,,img/productos/cubot-p90-256-16.jpg
+cubot-kinkonges-5-128-6,CUBOT KINKONGES 5 128/6,Cubot,celulares,155.0,NORTE,5,128 GB / 6 GB RAM,,img/productos/cubot-kinkonges-5-128-6.jpg
+cubot-kinkon-11-256-16,CUBOT KINKON 11 256/16,Cubot,celulares,275.0,NORTE,5,256 GB / 16 GB RAM,,img/productos/cubot-kinkon-11-256-16.jpg
+cubot-note-60-128-6,CUBOT NOTE 60 128/6,Cubot,celulares,130.0,NORTE,5,128 GB / 6 GB RAM,,img/productos/cubot-note-60-128-6.jpg
+cubot-kinkones-pro-128-6,CUBOT KINKONES PRO 128/6,Cubot,celulares,140.0,NORTE,5,128 GB / 6 GB RAM,,img/productos/cubot-kinkones-pro-128-6.jpg
+cubot-tab-kinkon-128-6,CUBOT TAB KINKON 128/6,Cubot,tablets,225.0,NORTE,5,128 GB / 6 GB RAM,,img/productos/cubot-tab-kinkon-128-6.jpg
+cubot-tab-kinkon-2-256-8,CUBOT TAB KINKON 2 256/8,Cubot,tablets,255.0,NORTE,5,256 GB / 8 GB RAM,,img/productos/cubot-tab-kinkon-2-256-8.jpg
+cubot-tab-mini-4-128-6,CUBOT TAB MINI 4 128/6,Cubot,tablets,165.0,NORTE,5,128 GB / 6 GB RAM,,img/productos/cubot-tab-mini-4-128-6.jpg
+samsung-s21-plus-128-8-homo,Samsung S21 + 128/8 homo,Samsung,celulares,310.0,NORTE,5,128 GB / 8 GB RAM,,img/productos/samsung-s21-plus-128-8-homo.jpg
+black-shark-128-6,BLACK SHARK 128/6,Black Shark,celulares,180.0,MALL,5,128 GB / 6 GB RAM,,img/productos/black-shark-128-6.jpg
+black-shark-pro-6-256,BLACK SHARK PRO 6 256,Black Shark,celulares,220.0,MALL,5,256 GB,,img/productos/black-shark-pro-6-256.jpg
+tcl-60-np-512-8,TCL 60 NP 512/8,TCL,celulares,195.0,CENTRAL,5,512 GB / 8 GB RAM,,img/productos/tcl-60-np-512-8.jpg
+tcl-50-pro-512-8,TCL 50 PRO 512/8,TCL,celulares,235.0,CENTRAL,5,512 GB / 8 GB RAM,,img/productos/tcl-50-pro-512-8.jpg
+tcl-60-ultra-512-12,TCL 60 ULTRA 512/12,TCL,celulares,460.0,CENTRAL,5,512 GB / 12 GB RAM,,img/productos/tcl-60-ultra-512-12.jpg
+tcl-tab-14np,TCL TAB 14np,TCL,tablets,405.0,CENTRAL,5,,,img/productos/tcl-tab-14np.jpg
+tcl-tab-gen-2,TCL TAB GEN 2,TCL,tablets,255.0,CENTRAL,5,,,img/productos/tcl-tab-gen-2.jpg

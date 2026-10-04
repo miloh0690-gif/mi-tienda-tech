@@ -299,6 +299,7 @@ ul{padding:0;list-style:none}
         <a href="#celulares">Celulares</a>
         <a href="#tablets">Tablets</a>
         <a href="#laptops">Laptops</a>
+        <a href="#accesorios">Accesorios</a>
         <a href="#argumentos">Por qué nosotros</a>
       </nav>
       <button class="menu-btn" id="menuBtn" aria-label="Abrir menú" aria-expanded="false" aria-controls="navAbajo">
@@ -311,6 +312,7 @@ ul{padding:0;list-style:none}
       <a href="#celulares">Celulares</a>
       <a href="#tablets">Tablets</a>
       <a href="#laptops">Laptops</a>
+      <a href="#accesorios">Accesorios</a>
       <a href="#argumentos">Por qué nosotros</a>
       <a href="#preguntas">Preguntas</a>
     </nav>
@@ -469,7 +471,8 @@ const CATEGORIAS = [
   { id: "exclusivos", titulo: "Exclusivos 3D", bajada: "Los tres equipos de la vitrina. Se giran, se cambian de color y se ven desde cualquier ángulo." },
   { id: "celulares",  titulo: "Celulares",  bajada: "Lo que hay en piso, con stock real por sucursal." },
   { id: "tablets",    titulo: "Tablets",    bajada: "De 8.7 a 14.6 pulgadas, para leer, dibujar o Replacement de notebook." },
-  { id: "laptops",    titulo: "Laptops",    bajada: "" }
+  { id: "laptops",    titulo: "Laptops",    bajada: "" },
+  { id: "accesorios", titulo: "Accesorios", bajada: "Parlantes, audifonos, cargadores y lo que completa el equipo." }
 ];
 
 // Los precios de este archivo ya son venta = costo + USD 5, calculado por la
@@ -488,9 +491,10 @@ const EXCLUSIVOS = [
     resumen: "El flagship del local. Pantalla grande, tres lentes y bateria de larga duracion.",
     tintables: ["17ProMax_color", "17ProMax_color2", "17ProMax_color3"],
     colores: [
-      { nombre: "Azul profundo", hex: "#1d3557" },
-      { nombre: "Naranja cobrizo", hex: "#c8622c" },
-      { nombre: "Plata", hex: "#d9dbe0" }
+      { nombre: "Borgoña", hex: "#6b1a3a" },
+      { nombre: "Gris", hex: "#8e8e93" },
+      { nombre: "Plata", hex: "#d9dbe0" },
+      { nombre: "Negro", hex: "#1c1c1e" }
     ],
     precioUsd: null
   },
@@ -518,11 +522,12 @@ const EXCLUSIVOS = [
     modeloOcultar: ["Object_25", "Object_77"],
     modeloCredito: "Modelo 3D de zhe_kan, CC BY-NC-SA 4.0. NO USAR COMERCIALMENTE hasta cambiarlo.",
     resumen: "Pantalla muy alta, lapiz incluido y el mejor zoom de la gama.",
-    tintables: ["Frame_Sky_Blue", "Frame_Sky_Blue.001"],
+    tintables: ["Frame_Sky_Blue", "Frame_Sky_Blue.001", "Glass_back", "Glass_back.001"],
     colores: [
+      { nombre: "Violeta cobalto", hex: "#4b4a9e" },
       { nombre: "Azul cielo", hex: "#90c2da" },
-      { nombre: "Grafito", hex: "#4a4d52" },
-      { nombre: "Lima", hex: "#c8d6a0" }
+      { nombre: "Negro", hex: "#1c1c1e" },
+      { nombre: "Blanco", hex: "#eef0f2" }
     ],
     precioUsd: null
   }
@@ -739,6 +744,19 @@ const INVENTARIO = [
   { id: "tcl-tab-gen-2", nombre: "TCL TAB GEN 2", marca: "TCL", cat: "tablets", precioUsd: 255.0, sucursal: "CENTRAL", stock: 5 },
 ];
 
+// ACCESORIOS: categorias genericas, sin precio hasta que se cargue el catalogo
+// real. Reemplazar por los productos concretos que venda el local.
+const ACCESORIOS = [
+  { id: "acc-parlantes",  nombre: "Parlantes",            precioUsd: null },
+  { id: "acc-audifonos",  nombre: "Audifonos",            precioUsd: null },
+  { id: "acc-cargadores", nombre: "Cargadores",           precioUsd: null },
+  { id: "acc-fundas",     nombre: "Fundas y protectores", precioUsd: null },
+  { id: "acc-powerbank",  nombre: "Power banks",          precioUsd: null },
+  { id: "acc-cables",     nombre: "Cables y adaptadores", precioUsd: null }
+].map(a => ({ ...a, cat: "accesorios", marca: "Accesorios", sucursal: "", stock: 0 }));
+
+const TODOS = INVENTARIO.concat(ACCESORIOS);
+
 const ARGUMENTOS = [
   {
     id: "precio",
@@ -803,7 +821,6 @@ function enlaceWA(producto) {
   if (producto.marca) partes.push("• Marca: " + producto.marca);
   if (producto.config) partes.push("• " + producto.config);
   if (producto.sucursal) partes.push("• Sucursal: " + producto.sucursal);
-  if (producto.stock) partes.push("• Stock: " + producto.stock + " unidades");
   return base + "?text=" + encodeURIComponent(partes.join("\n"));
 }
 
@@ -826,11 +843,11 @@ function filaDatos(etiqueta, valor) {
 
 function tarjetaProducto(p) {
   const precio = precioTexto(p);
-  const stock = p.stock ? (p.stock > 0 ? '<span class="stock ok">' + p.stock + " disponibles</span>" : '<span class="stock agotado">Sin stock</span>') : "";
+  const sucursal = p.sucursal ? '<span class="sucursal">' + p.sucursal + "</span>" : "";
   return '<article class="tarjeta">' +
     '<div class="tarjeta-cab">' +
       '<span class="marca-chip">' + p.marca + "</span>" +
-      '<span class="sucursal">' + p.sucursal + "</span>" +
+      sucursal +
     "</div>" +
     '<div class="tarjeta-figura">' +
       '<img src="' + (p.img || ('img/productos/' + p.id + '.jpg')) + '" alt="' + p.nombre + '" loading="lazy" decoding="async" onerror="this.remove()">' +
@@ -839,10 +856,11 @@ function tarjetaProducto(p) {
     '<h3 class="tarjeta-nombre">' + p.nombre + "</h3>" +
     (p.config ? '<p class="tarjeta-config">' + p.config + "</p>" : "") +
     '<p class="tarjeta-precio">' + precio.grande + "<small>" + precio.nota + "</small></p>" +
-    '<dl class="especificaciones">' +
-      filaDatos("Stock", stock) +
-      filaDatos("Pantalla", p.pantalla ? p.pantalla + '"' : "") +
-    "</dl>" +
+    (p.config || p.pantalla
+      ? '<dl class="especificaciones">' +
+          filaDatos("Pantalla", p.pantalla ? p.pantalla + '"' : "") +
+        "</dl>"
+      : "") +
     '<div class="tarjeta-acciones">' +
       '<a class="btn btn-azul btn-mini" href="' + enlaceWA(p) + '" target="_blank" rel="noopener">Consultar</a>' +
       '<button class="btn btn-linea btn-mini" data-ficha="' + p.id + '">Ficha</button>' +
@@ -882,7 +900,7 @@ function seccionCategoria(cat) {
       "</div>" +
     "</section>";
   }
-  const items = INVENTARIO.filter(p => p.cat === cat.id && (marcaActiva === "todas" || p.marca === marcaActiva));
+  const items = TODOS.filter(p => p.cat === cat.id && (marcaActiva === "todas" || p.marca === marcaActiva));
   if (!items.length) return "";
   return '<section class="seccion" id="' + cat.id + '">' +
     '<div class="envoltorio">' +
@@ -903,7 +921,7 @@ function seccionCategoria(cat) {
 }
 
 function pintarFiltros() {
-  const marcas = Array.from(new Set(INVENTARIO.map(p => p.marca))).sort((a, b) => a.localeCompare(b));
+  const marcas = Array.from(new Set(TODOS.map(p => p.marca))).sort((a, b) => a.localeCompare(b));
   $("#filtros").innerHTML = ['<button class="filtro activo" data-marca="todas">Todas</button>']
     .concat(marcas.map(m => '<button class="filtro" data-marca="' + m + '">' + m + "</button>"))
     .join("");
@@ -1057,7 +1075,7 @@ function abrirArgumento(id) {
 }
 
 function abrirFicha(id) {
-  const p = INVENTARIO.find(x => x.id === id) || EXCLUSIVOS.find(x => x.id === id);
+  const p = TODOS.find(x => x.id === id) || EXCLUSIVOS.find(x => x.id === id);
   if (!p) return;
   const bloques = [];
   if (p.config || p.pantalla) {
@@ -1067,8 +1085,8 @@ function abrirFicha(id) {
   }
   if (p.sucursal) {
     bloques.push('<div class="bloque"><h4>Disponibilidad</h4><dl class="especificaciones" style="border:0;margin-top:8px">' +
-      filaDatos("Sucursal", p.sucursal) + filaDatos("Unidades", p.stock) +
-      "</dl><p>El stock cambia durante el dia. Confirmamos disponibilidad al escribirte.</p></div>");
+      filaDatos("Sucursal", p.sucursal) +
+      "</dl><p>Consultanos y te confirmamos al instante.</p></div>");
   }
   if (p.colores && p.colores.length) {
     bloques.push('<div class="bloque"><h4>Colores</h4><p>' + p.colores.map(c => c.nombre).join(" &middot; ") + "</p></div>");
@@ -1450,13 +1468,13 @@ document.addEventListener("click", e => {
   }
   const ficha = e.target.closest("[data-ficha]");
   if (ficha) {
-    const p = INVENTARIO.find(x => x.id === ficha.dataset.ficha) || EXCLUSIVOS.find(x => x.id === ficha.dataset.ficha);
+    const p = TODOS.find(x => x.id === ficha.dataset.ficha) || EXCLUSIVOS.find(x => x.id === ficha.dataset.ficha);
     if (p) abrirFicha(p.id);
     return;
   }
   const ver3d = e.target.closest("[data-ver3d]");
   if (ver3d) {
-    const p = INVENTARIO.find(x => x.id === ver3d.dataset.ver3d) || EXCLUSIVOS.find(x => x.id === ver3d.dataset.ver3d);
+    const p = TODOS.find(x => x.id === ver3d.dataset.ver3d) || EXCLUSIVOS.find(x => x.id === ver3d.dataset.ver3d);
     if (!p) return;
     if (p.modelo3d) abrirVisor(p);
     else abrirFicha(p.id);

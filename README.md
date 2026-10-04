@@ -4,42 +4,24 @@ Catalogo de venta de equipos con visor 3D para los modelos mas recientes.
 Un solo `index.html`, sin backend.
 
 **Antes de publicar:** leer [LEEME.md](LEEME.md). Dos de los tres modelos 3D
-tienen licencia que prohibe uso comercial, y los precios estan sin cargar a
-proposito.
+tienen licencia que prohibe uso comercial.
 
-## Que hay que completar
+**Para ver las fotos, donde van y como se nombran:** ver la seccion
+"Dónde van las fotos" de [LEEME.md](LEEME.md). En corto: `img/productos/<id>.jpg`
+donde `<id>` es el nombre del modelo en minusculas con guiones.
+
+**Que hay que completar**
 
 | Que | Donde |
 |---|---|
-| Numero de WhatsApp | `WHATSAPP_NUMERO` en el script |
-| Fotos de producto | `img/` (vacio) y el campo `img` de cada producto |
-| Precios | campo `precioBs` — `null` muestra "Consultar" |
-| Especificaciones | campo `specs` — vacio no dibuja la lista |
+| Precios y productos de accesorios | campos `precioUsd` y el array `ACCESORIOS` |
+| Fotos reales | `img/productos/<id>.jpg` (hoy hay placeholders) |
+| Especificaciones | campo `config` / `pantalla`, si el nombre no las trae |
 
-## Arrancar local
+**WhatsApp:** ya esta en `WHATSAPP_NUMERO` (59160126617).
 
-```
-python3 -m http.server 8080
-```
-
-Abrir `http://localhost:8080` **desde la raiz de este repo**. No abrir el
-archivo con doble clic ni servir otra carpeta: si el servidor no arranca aqui,
-el navegador muestra un listado de archivos y no se ve nada del sitio.
-
-## Licencias de los modelos 3D
-
-| Archivo | Licencia | ¿En una tienda? |
-|---|---|---|
-| `iphone_18_pro_max__high_quality_3d_model.glb` | CC-BY-4.0 | Si, con credito visible (ya esta en `modeloCredito`) |
-| `samsung_galaxy_s26_ultra.glb` | CC-BY-NC-SA-4.0 | **Prohibido uso comercial** |
-| `macbook_pro_14-inch_m5.glb` | Sketchfab Standard | **Prohibido uso comercial** |
-
-Detalle y alternativas en [LEEME.md](LEEME.md).
-
-## Desplegar
-
-Sitio estatico: la raiz del repo es la raiz del sitio. En Vercel, importar el repo
-y no configurar build command ni output directory.
+**Desplegar:** sitio estatico. La raiz del repo es la raiz del sitio. En Vercel,
+importar el repo sin configurar build command ni output directory.
 
 ---
 
@@ -104,10 +86,11 @@ esquema y el visor 3D no arranca.
 | Qué | Dónde | Nota |
 |---|---|---|
 | Número de WhatsApp | `WHATSAPP_NUMERO` (línea ~380) | Hoy es un placeholder inventado `591000000000`. Sin esto todos los botones abren un chat al número equivocado. |
-| Fotos | `img/` | Hoy no existe. Las rutas están en el campo `img` de cada producto. Si falta el archivo, el `<img>` se borra solo y queda el ícono de la categoría. |
+| Fotos | `img/productos/` | Hay 214 placeholders. Se sobreescriben con la foto real, misma ruta. Ver "Dónde van las fotos" abajo. |
 | Modelos 3D | `modelos/` | **Ya están los 3.** Los de Samsung y MacBook tienen licencia que prohíbe uso comercial: ver el bloqueo de arriba. |
 | Precios | `precioBs` | `null` = el sitio muestra "Consultar". No inventes precio: es lo más fácil de cambiar y después es una pelea con el cliente. |
-| Especificaciones | `specs` | Ídem. Si está vacío, no se dibuja la lista. |
+| Pantalla | `pantalla` | Sale del nombre del modelo ("Tab A11 8.7" → 8.7"). |
+| Accesorios | `ACCESORIOS` | Hoy son 6 categorías genéricas sin precio. Reemplazar por los productos reales. |
 | Colores | `muestras` | Solo son el color del botón y el texto del mensaje de WhatsApp. **No cambia la imagen**, la foto la tenés que subir por color. |
 
 ## Agregar un producto
@@ -143,6 +126,36 @@ Todo vive en el array `PRODUCTOS`. Un objeto:
 `modeloOcultar` es para los Sketchfab que traen fondo. Ver abajo.
 
 El orden en que aparecen sale de `CATEGORIAS`, no del array.
+
+## Dónde van las fotos
+
+```
+img/productos/<id>.jpg
+```
+
+`<id>` es el nombre del modelo en minúsculas, sin tildes, unido por guiones.
+El `+` va como `plus`.
+
+| Producto | id | Archivo |
+|---|---|---|
+| `REDMI A7 64/4` | `redmi-a7-64-4` | `img/productos/redmi-a7-64-4.jpg` |
+| `NOTE 15 PRO + 5G` | `note-15-pro-plus-5g` | `img/productos/note-15-pro-plus-5g.jpg` |
+| `Tab A11 8.7 CHIP` | `tab-a11-8-7-chip` | `img/productos/tab-a11-8-7-chip.jpg` |
+
+Si dos productos se llaman igual, el segundo lleva `-2`:
+`honor-pad-x9a.jpg` y `honor-pad-x9a-2.jpg`.
+
+**La tabla completa está en `Datos/catalogo.csv`, columna `foto`.** Y en
+`Datos/fotos-pendientes.txt` están los 214 nombres listos para copiar.
+
+Los 3 exclusivos ya tienen imagen, pero es un **render 3D del modelo**, no una
+foto: `img/exclusivos/*.png`. Si preferís una foto, sobreescribí esos archivos
+poniéndoles el mismo nombre en `.jpg` y editando el campo `img` de esos tres
+productos.
+
+Si querés que la foto viva en otro lado (otra carpeta, un CDN), editá el campo
+`img` de ese producto en el array. Sin ese campo, el sitio asume
+`img/productos/<id>.jpg`.
 
 ## Agregar una categoría
 
